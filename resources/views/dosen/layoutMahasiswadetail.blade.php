@@ -93,34 +93,38 @@
             <div class="card-body">
                 <table class="table" id="table1">
                     <tbody>
-                        <tr>
-                            <td>Nama</td>
-                            <td>{{ $query[0]->nama }}</td>
-                        </tr>
-                        <tr>
-                            <td>NIM</td>
-                            <td>{{ $query[0]->nim }}</td>
-                        </tr>
-                        <tr>
-                            <td>Judul Skripsi</td>
-                            <td>{{ $query[0]->judul_skripsi }}</td>
-                        </tr>
-                        <tr>
-                            <td>Angkatan</td>
-                            <td>{{ $query[0]->angkatan }}</td>
-                        </tr>
-                        <?php $i = 1; ?>
-                        @foreach ($query as $qr)
-                            <tr>
-                                <td>Dosen Pembimbing {{ $i }}</td>
-                                <td>{{ $qr->dosen_pembimbing }}</td>
-                            </tr>
-                            <?php ++$i; ?>
+                        <?php $i = 0; ?>
+                        @foreach ($query as $item)
+                            @if ($i == 0)
+                                <tr>
+                                    <td>Nama</td>
+                                    <td>{{ $item->nama }}</td>
+                                </tr>
+                                <tr>
+                                    <td>NIM</td>
+                                    <td>{{ $item->nim }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Judul Skripsi</td>
+                                    <td>{{ $item->judul_skripsi }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Angkatan</td>
+                                    <td>{{ $item->angkatan }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Dosen Pembimbing <?= $i + 1 ?></td>
+                                    <td>{{ $item->dosen_pembimbing }}</td>
+                                </tr>
+                            @endif
+                            <?php $i++; ?>
+                            @if ($i == 2)
+                                <tr>
+                                    <td>Dosen Pembimbing <?= $i ?></td>
+                                    <td>{{ $item->dosen_pembimbing }}</td>
+                                </tr>
+                            @endif
                         @endforeach
-                        <tr>
-                            <td>Keterangan Progres</td>
-                            <td>{{ $progres[0]->keterangan }}</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>

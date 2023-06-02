@@ -1,7 +1,7 @@
 @extends('dosen/layout')
 
 @section('title')
-    <title>Dosen - Dashboard</title>
+    <title>Dosen - Input Nilai Uji Program</title>
 @endsection
 
 @section('sidebar')
@@ -51,7 +51,7 @@
             </li>
         </ul>
     </li>
-    <li class="sidebar-item has-sub">
+    <li class="sidebar-item has-sub active">
         <a href="#" class='sidebar-link active'>
             <span>Input Nilai</span>
         </a>

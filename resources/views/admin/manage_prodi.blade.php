@@ -1,181 +1,17 @@
 @extends('admin/layout')
 
 @section('title')
-    <title>Admin - Manajemen Prodi</title>
+    <title>Admin - Manajemen Pegawai Prodi</title>
 @endsection
 
-@section('sidebar')
-    <li class="sidebar-item">
-        <a href="/admin/dashboard" class='sidebar-link'>
-
-            <span>Dashboard</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="{{ route('mhs_ta') }}" class='sidebar-link'>
-            <i class="bi bi-people-fill"></i>
-            <span>Mahasiswa TA</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('aktif') }}">Mahasiswa Aktif</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('alumni') }}">Lulus / Alumni</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Seminar Proposal</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_dosbing') }}">Dosen Pembimbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_skripsi') }}">Judul Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/validasi_sempro">Berkas Administrasi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="{{ route('prasemhas_menu') }}" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Seminar Hasil</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_dosenPenguji') }}">Dosen Penguji</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/validasi_semhas">Berkas Administrasi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item">
-        <a href="/admin/validasi_sidang" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Sidang Meja Hijau</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub active">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-person-badge-fill"></i>
-            <span>Manajemen User</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_admin">Admin</a>
-            </li>
-            <li class="submenu-item active">
-                <a href="/admin/manajemen_prodi">Prodi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_dosen">Dosen</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_mhs">Mahasiswa</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-pen-fill"></i>
-            <span>Penjadwalan</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_sempro') }}">Seminar Proposal</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_semhas') }}">Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_sidang') }}">Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clock-history"></i>
-            <span>Riwayat Aktivitas</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('log_pendaftaran_dosbing') }}">Riwayat Pendaftaran Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pengubahan_dosbing') }}">Riwayat Pengubahan Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_penghapusan_dosbing') }}">Riwayat Penghapusan Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pendaftaran_skripsi') }}">Riwayat Pendaftaran Judul Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pengubahan_skripsi') }}">Riwayat Pengubahan Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_penghapusan_skripsi') }}">Riwayat Penghapusan Skripsi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item">
-        <a href="{{ route('profile_admin') }}" class='sidebar-link'>
-
-            <span>Profil</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub ">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clipboard-plus"></i>
-            <span>Input Nilai</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_IPK') }}">Input Nilai IPK</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_uji_program') }}">Input Nilai Uji Program</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_semhas') }}">Input Nilai Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('nilai_sidang_admin') }}">Input Nilai Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-@endsection
+@include('admin/sidebar')
 
 @section('content')
     <div class="page-heading">
         <div class="page-title">
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
-                    <h3>Manajemen User Prodi</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ '/admin/mng_user' }}">Manajemen User</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Prodi</li>
-                        </ol>
-                    </nav>
+                    <h3>Manajemen User Pegawai rodi</h3>
                 </div>
             </div>
         </div>
@@ -185,7 +21,7 @@
                 <div class="card card-outline-secondary">
                     <div class="row align-items-center m-5">
                         <div class="col-md mb-6">
-                            <h5>Daftar Akun dan Data Prodi</h5></br>
+                            <h5>Daftar Akun dan Data Pegawai Prodi</h5></br>
                             <a href="/admin/add_prodi" class="btn btn-success btn-sm"><i
                                     class="bi bi-plus-circle"></i>&nbsp;&nbsp;Daftar baru</a>
                             <br><br>
@@ -206,11 +42,11 @@
                                 @endif
                                 <table class="table table-bordered mb-0 text-center">
                                     <thead>
-                                        <tr>
+                                        <tr class="text-center table-success">
                                             <th>No.</th>
                                             <th>Nama</th>
-                                            <th>NIP</th>
-                                            <th>NIDN</th>
+                                            {{-- <th>NIP</th>
+                                            <th>NIDN</th> --}}
                                             <th>Kode</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -222,8 +58,8 @@
                                                 <td>{{ $i }}</td>
                                                 <td class="text-bold-500">{{ $prodi->nama }}</td>
                                                 <td>{{ $prodi->nip }}</td>
-                                                <td>{{ $prodi->NIDN }}</td>
-                                                <td>{{ $prodi->kode }}</td>
+                                                {{-- <td>{{ $prodi->NIDN }}</td>
+                                                <td>{{ $prodi->kode }}</td> --}}
                                                 <td>
                                                     <center>
                                                         <table>
@@ -244,10 +80,60 @@
                                                                         @csrf
                                                                         <input type="hidden" name="nip"
                                                                             value="{{ $prodi->nip }}">
-                                                                        <button type="submit"
+                                                                        <button type="button" name="button"
                                                                             class="btn btn-danger btn-sm"
-                                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data prodi ini? Anda tidak akan dapat mengembalikan data yang telah dihapus.')"><i
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#exampleModal{{ $prodi->nip }}"><i
                                                                                 class="bi bi-trash"></i>&nbsp;&nbsp;Hapus</button>
+                                                                        <div class="modal fade text-left"
+                                                                            id="exampleModal{{ $prodi->nip }}"
+                                                                            tabindex="-1" role="dialog"
+                                                                            aria-labelledby="myModalLabel1"
+                                                                            aria-hidden="true">
+                                                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                                                                role="document">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header bg-danger">
+                                                                                        <h5 class="modal-title white"
+                                                                                            id="myModalLabel1">Konfirmasi
+                                                                                            Hapus</h5>
+                                                                                        <button type="button"
+                                                                                            class="close"
+                                                                                            data-bs-dismiss="modal"
+                                                                                            aria-label="Close">
+                                                                                            <i data-feather="x"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                    <div class="modal-body text-center">
+                                                                                        <p>Apakah Anda yakin ingin menghapus
+                                                                                            data prodi ini? Anda tidak akan
+                                                                                            dapat mengembalikan data yang
+                                                                                            telah dihapus.</p>
+                                                                                    </div>
+                                                                                    <div class="modal-footer">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-light-secondary"
+                                                                                            data-bs-dismiss="modal">
+                                                                                            <i
+                                                                                                class="bx bx-x d-block d-sm-none"></i>
+                                                                                            <span
+                                                                                                class="d-none d-sm-block">Batal</span>
+                                                                                        </button>
+                                                                                        <button type="submit"
+                                                                                            class="btn btn-danger ml-1">
+                                                                                            <i
+                                                                                                class="bx bx-check d-block d-sm-none"></i>
+                                                                                            <span
+                                                                                                class="d-none d-sm-block">Hapus</span>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {{-- <button type="submit" class="btn btn-danger btn-sm"
+                                                                            onclick="return confirm('Apakah Anda yakin ingin menghapus data prodi ini? Anda tidak akan dapat mengembalikan data yang telah dihapus.')"><i
+                                                                                class="bi bi-trash"></i>&nbsp;&nbsp;Hapus</button> --}}
                                                                     </form>
                                                                 </td>
                                                             </tr>

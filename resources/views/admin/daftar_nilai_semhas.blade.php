@@ -4,63 +4,7 @@
     <title>Admin - Input Nilai Seminar Hasil</title>
 @endsection
 
-@section('sidebar')
-    <li class="sidebar-item">
-        <a href="/prodi/dashboard" class='sidebar-link'>
-
-            <span>Dashboard</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="/prodi/menu_mahasiswa" class='sidebar-link'>
-            <i class="bi bi-people-fill"></i>
-            <span>Mahasiswa TA</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="/prodi/menu_mahasiswa/mahasiswa_aktif">Mahasiswa Aktif</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/kaprodi/menu_mahasiswa/mahasiswa_alumni">Lulus / Alumni</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item ">
-        <a href="/prodi/beritaacara" class='sidebar-link'>
-
-            <span>Berita Acara</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item  ">
-        <a href="/prodi/undangan_daftar_peserta" class='sidebar-link'>
-
-            <span>Undangan dan Daftar Peserta</span>
-        </a>
-    </li>
-    <li class="sidebar-item has-sub active">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clipboard-plus"></i>
-            <span>Input Nilai</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('nilai_IPK') }}">Input Nilai IPK</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('nilai_uji_program') }}">Input Nilai Uji Program</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_semhas') }}">Input Nilai Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('nilai_sidang') }}">Input Nilai Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-@endsection
+@include('admin/sidebar')
 
 
 @section('content')
@@ -69,13 +13,6 @@
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>Daftar Nilai Seminar Hasil</h3>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item active" aria-current="page">Input Nilai Seminar Hasil</li>
-                        </ol>
-                    </nav>
                 </div>
             </div>
         </div>
@@ -101,7 +38,7 @@
                                 @endif
                                 <table class="table table-bordered mb-0">
                                     <thead class="text-center">
-                                        <tr>
+                                        <tr class="text-center table-success">
                                             <th>No.</th>
                                             <th>Nama / NIM</th>
                                             <th colspan="3">Nilai </th>
@@ -118,7 +55,7 @@
                                                 <td class="text-bold-500">{{ $mahasiswas[$i]->nama }}
                                                     ({{ $mahasiswas[$i]->nim }})</td>
                                                 <td colspan="3">
-                                                    @if ($mahasiswas[$i]->nama != null)
+                                                    @if ($mahasiswas[$i]->total != null)
                                                         <p>{{ $mahasiswas[$i]->nama_dsn }} : {{ $mahasiswas[$i]->total }}
                                                         </p>
                                                     @else
@@ -133,14 +70,13 @@
                                                             <tr>
                                                                 @if ($mahasiswas[$i]->total != null)
                                                                     <td>
-                                                                        <form
-                                                                            action="{{ route('adm_edit_nilai_semhas') }}">
+                                                                        <form action="{{ route('adm_edit_nilai_semhas') }}">
                                                                             @csrf
                                                                             <input type="hidden" name="nim"
                                                                                 value="{{ $mahasiswas[$i]->nim }}">
                                                                             <button type="submit"
                                                                                 class="btn btn-warning btn-sm"><i
-                                                                                    class="bi bi-pencil-square"></i></button>
+                                                                                    class="bi bi-pencil-square"></i>Edit</button>
                                                                         </form>
                                                                     </td>
                                                                     <td>
@@ -150,10 +86,65 @@
                                                                             @csrf
                                                                             <input type="hidden" name="nim"
                                                                                 value="{{ $mahasiswas[$i]->nim }}">
-                                                                            <button type="submit"
+                                                                            <button type="button"
+                                                                                class="btn btn-danger btn-sm"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#exampleModal{{ $mahasiswas[$i]->nim }}"><i
+                                                                                    class="bi bi-trash"></i>Hapus</button>
+                                                                            <div class="modal fade
+                                                                                text-left"
+                                                                                id="exampleModal{{ $mahasiswas[$i]->nim }}"
+                                                                                tabindex="-1" role="dialog"
+                                                                                aria-labelledby="myModalLabel1"
+                                                                                aria-hidden="true">
+                                                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                                                                    role="document">
+                                                                                    <div class="modal-content">
+                                                                                        <div class="modal-header bg-danger">
+                                                                                            <h5 class="modal-title white"
+                                                                                                id="myModalLabel1">
+                                                                                                Konfirmasi Hapus</h5>
+                                                                                            <button type="button"
+                                                                                                class="close"
+                                                                                                data-bs-dismiss="modal"
+                                                                                                aria-label="Close">
+                                                                                                <i data-feather="x"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="modal-body
+                                                                                            text-center">
+                                                                                            <p>Apakah anda yakin ingin
+                                                                                                menghapus data ini?</p>
+                                                                                            <p>Anda tidak dapat
+                                                                                                mengembalikan data yang
+                                                                                                telah dihapus.</p>
+                                                                                        </div>
+                                                                                        <div class="modal-footer">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-light-secondary"
+                                                                                                data-bs-dismiss="modal">
+                                                                                                <i
+                                                                                                    class="bx bx-x d-block d-sm-none"></i>
+                                                                                                <span
+                                                                                                    class="d-none d-sm-block">Batal</span>
+                                                                                            </button>
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-danger ml-1">
+                                                                                                <i
+                                                                                                    class="bx bx-check d-block d-sm-none"></i>
+                                                                                                <span
+                                                                                                    class="d-none d-sm-block">Hapus</span>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {{-- <button type="submit"
                                                                                 class="btn btn-danger btn-sm"
                                                                                 onclick="return confirm('Yakin ingin menghapus? Anda tidak dapat mengembalikan data yang telah dihapus.')"><i
-                                                                                    class="bi bi-trash"></i></button>
+                                                                                    class="bi bi-trash"></i></button> --}}
                                                                         </form>
                                                                     </td>
                                                             </tr>
@@ -168,7 +159,7 @@
                                                                         <button type="submit"
                                                                             class="btn btn-success btn-sm"><i
                                                                                 class="bi bi-plus-square"></i>
-                                                                            Daftar</button>
+                                                                            Tambahkan Nilai</button>
                                                                     </form>
                                                                 </td>
                                                             </tr>

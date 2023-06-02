@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use PDF;
+use App\Models\Exum;
 use App\Models\User;
 use App\Models\Dosen;
 use App\Models\Skripsi;
 use App\Models\Mahasiswa;
+use App\Models\NilaiSemhas;
+use App\Models\NilaiSidang;
+use App\Models\DosenPenguji;
+use App\Models\JadwalSemhas;
+use App\Models\JadwalSempro;
+use App\Models\JadwalSidang;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -15,14 +22,648 @@ use App\Models\BimbinganSempro;
 use App\Models\BimbinganSidang;
 use App\Models\DosenPembimbing;
 use App\Models\NilaiUjiProgram;
+use App\Models\NilaiSeminarHasil;
+use App\Models\NilaiUjiKelayakan;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 class DosenController extends Controller
 {
 
     public $nim;
+
+    public function store_jd_sidang_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'date'     => 'required',
+            'waktu'    => 'required',
+            'tempat'   => 'required|min:10|max:64'
+        ]);
+
+        $nama = $request->nama;
+        $jadwal_sidang = new JadwalSidang;
+        $jadwal_sidang->nim = $request->nim;
+        $jadwal_sidang->tanggal_sidang = $request->date;
+        $jadwal_sidang->waktu = $request->waktu;
+        $jadwal_sidang->tempat = $request->tempat;
+        $jadwal_sidang->save();
+        DB::select("CALL tahapKeenam($request->nim)");
+        return redirect('/pegawai_prodi/sidang_penjadwalan')->with('success_add_sidang', 'Jadwal sidang berhasil ditambahkan!');
+    }
+
+    public function add_jd_sidang_pegawai(Request $request)
+    {
+        $mahasiswa = DB::table('mahasiswas as m')
+            ->where('nim', $request->nim)
+            ->select('m.nim', 'm.nama')
+            ->first();
+        return view('pegawai_prodi/add_jd_sidang_pegawai', compact('mahasiswa'));
+    }
+
+    public function delete_jd_sidang_pegawai(Request $request)
+    {
+        //ubah status akses
+        DB::select("CALL tahapKelima($request->nim)");
+        JadwalSidang::where('nim', $request->nim)->delete();
+        return redirect('/pegawai_prodi/sidang_penjadwalan')->with('success_delete_sidang', 'Jadwal sidang berhasil dihapus!');
+    }
+
+    public function store_new_jd_sidang_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'date'     => 'required',
+            'waktu'    => 'required',
+            'tempat'   => 'required|min:10|max:64'
+        ]);
+        JadwalSidang::where('nim', $request->nim)->update([
+            'tanggal_sidang'    => $request->date,
+            'waktu'             => $request->waktu,
+            'tempat'            => $request->tempat,
+        ]);
+        return redirect('/pegawai_prodi/sidang_penjadwalan')->with('success_edit_sidang', 'Jadwal sidang berhasil diubah!');
+    }
+
+    public function edit_jd_sidang_pegawai(Request $request)
+    {
+        $nama = $request->nama;
+        $jadwal = JadwalSidang::where('nim', $request->nim)->select('nim', 'tanggal_sidang', 'waktu', 'tempat')->first();
+        return view('pegawai_prodi/edit_jd_sidang_pegawai', compact('nama', 'jadwal'));
+    }
+
+    public function cetakJadwalSidang_pegawai(Request $request)
+    {
+        $tanggal_sidang = $request->tanggal_sidang;
+
+        $query = DB::table('jdsidangmejahijau as js')
+            ->leftJoin('v_dosen_penguji as db', 'js.nim', '=', 'db.nim')
+            ->select('js.nama', 'js.nim', 'js.judul_skripsi', 'js.nama_dosen', 'js.waktu', 'js.tempat', 'js.tanggal_sidang', 'db.nama_dosen_penguji1', 'db.nama_dosen_penguji2')
+            ->where('js.tanggal_sidang', '=', $tanggal_sidang)
+            ->get();
+
+        return view('admin.berkas.pesertaSidang', compact('query'));
+    }
+
+    public function cetakUndanganSidang_pegawai(Request $request)
+    {
+        $tanggal_sidang = $request->tanggal_sidang;
+
+        $query = DB::table('jdsidangmejahijau as js')->select('js.waktu', 'js.tanggal_sidang', 'js.tempat')
+            ->where('js.tanggal_sidang', '=', $tanggal_sidang)->get();
+        return view('admin.berkas.undangan_sidang', compact('query'));
+    }
+
+    public function sidang_penjadwalan()
+    {
+        $mahasiswas = DB::table('mahasiswas as m')
+            ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+            ->leftJoin('jadwal_sidangs as js', 'm.nim', '=', 'js.nim')
+            ->select('m.nim', 'm.nama', 'js.tanggal_sidang', 'js.waktu', 'js.tempat')
+            ->where('m.status', '=', 'aktif')
+            ->where('s.no_statusAkses', '=', 5)
+            ->orWhere('s.no_statusAkses', '=', 6)
+            ->orderBy('js.tanggal_sidang', 'DESC')
+            ->paginate(10);
+        $query = DB::table('mahasiswas as m')
+            ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+            ->leftJoin('jadwal_sidangs as js', 'm.nim', '=', 'js.nim')
+            ->select('m.nim', 'm.nama', 'js.tanggal_sidang', 'js.waktu', 'js.tempat')
+            ->where('m.status', '=', 'aktif')
+            ->where('s.no_statusAkses', '=', 5)
+            ->orWhere('s.no_statusAkses', '=', 6)
+            ->distinct()->orderBy('tanggal_sidang', 'ASC')
+            ->get();
+        // $query = DB::table('mahasiswas as m')
+        // ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+        //     ->leftJoin('jadwal_sempros as js', 'm.nim', '=', 'js.nim')
+        //     ->select('m.nim', 'm.nama', 'js.tanggal_sempro', 'js.waktu', 'js.tempat')
+        //     ->where('m.status', '=', 'aktif', 'and', 'js.tanggal_sempro', '!=', 'null')
+        //     ->where('s.no_statusAkses', '=', 1)
+        //     ->orWhere('s.no_statusAkses', '=', 2)
+        //     ->distinct()->orderBy('tanggal_sempro', 'ASC')
+        //     ->get();
+        return view('pegawai_prodi/sidang_penjadwalan', compact('mahasiswas', 'query'));
+    }
+
+    public function store_jd_semhas_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'date'     => 'required',
+            'waktu'    => 'required',
+            'tempat'   => 'required|min:6|max:64'
+        ]);
+
+        $jadwal_semhas = new JadwalSemhas;
+        $jadwal_semhas->nim = $request->nim;
+        $jadwal_semhas->tanggal_semhas = $request->date;
+        $jadwal_semhas->waktu = $request->waktu;
+        $jadwal_semhas->tempat = $request->tempat;
+        $jadwal_semhas->save();
+
+        if (DosenPenguji::where('nim', $request->nim)->count() > 0) {
+            DB::select("CALL tahapKeempat($request->nim)");
+            return redirect('/pegawai_prodi/semhas_penjadwalan')->with('success_add_semhas', 'Jadwal Seminar Hasil berhasil ditambahkan');
+        } else {
+            return redirect('/pegawai_prodi/semhas_penjadwalan')->with('failed_add_semhas', 'Jadwal Seminar Gagal ditambahkan');
+        }
+    }
+
+    public function add_jd_semhas_pegawai(Request $request)
+    {
+        $mahasiswa = DB::table('mahasiswas as m')
+            ->where('nim', $request->nim)
+            ->select('m.nim', 'm.nama')
+            ->first();
+        return view('pegawai_prodi/add_jd_semhas_pegawai', compact('mahasiswa'));
+    }
+
+    public function delete_jd_semhas_pegawai(Request $request)
+    {
+        //ubah status akses
+        DB::select("CALL tahapKetiga($request->nim)");
+        JadwalSemhas::where('nim', $request->nim)->delete();
+        return redirect('/pegawai_prodi/semhas_penjadwalan')->with('success_delete_semhas', 'Jadwal seminar hasil berhasil dihapus!');
+    }
+
+    public function store_new_jd_semhas_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'date'     => 'required',
+            'waktu'    => 'required',
+            'tempat'   => 'required|min:10|max:64'
+        ]);
+
+        JadwalSemhas::where('nim', $request->nim)->update([
+            'tanggal_semhas'   => $request->date,
+            'waktu'            => $request->waktu,
+            'tempat'           => $request->tempat,
+        ]);
+
+        return redirect('/pegawai_prodi/semhas_penjadwalan')->with('success_edit_semhas', 'Jadwal seminar hasil berhasil diubah!');
+    }
+
+    public function edit_jd_semhas_pegawai(Request $request)
+    {
+        $nama = $request->nama;
+        $jadwal = JadwalSemhas::where('nim', $request->nim)->select('nim', 'tanggal_semhas', 'waktu', 'tempat')->first();
+        return view('pegawai_prodi/edit_jd_semhas_pegawai', compact('nama', 'jadwal'));
+    }
+
+    public function cetakJadwalSemhas_pegawai(Request $request)
+    {
+        $tanggal_semhas = $request->tanggal_semhas;
+
+        $query = DB::table('v_jdSemhas as js')
+            ->leftJoin('v_dosen_penguji as db', 'js.nim', '=', 'db.nim')
+            ->select('js.nama', 'js.nim', 'js.judul_skripsi', 'js.nama_dosen', 'js.waktu', 'js.tempat', 'js.tanggal_semhas', 'db.nama_dosen_penguji1', 'db.nama_dosen_penguji2')
+            ->where('js.tanggal_semhas', '=', $tanggal_semhas)
+            ->get();
+
+        return view('admin.berkas.pesertaSemhas', compact('query'));
+    }
+
+    public function cetakUndanganSemhas_pegawai(Request $request)
+    {
+        $tanggal_semhas = $request->tanggal_semhas;
+
+        $query = DB::table('v_jdSemhas as js')
+            ->where('js.tanggal_semhas', '=', $tanggal_semhas)
+            ->get();
+
+        return view('admin.berkas.undangan_semhas', compact('query'));
+    }
+
+    public function semhas_penjadwalan()
+    {
+        // $query = DB::table('mahasiswas as m')
+        // ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+        // ->leftJoin('jadwal_sempros as js', 'm.nim', '=', 'js.nim')
+        // ->select('m.nim', 'm.nama', 'js.tanggal_sempro', 'js.waktu', 'js.tempat')
+        // ->where('m.status', '=', 'aktif', 'and', 'js.tanggal_sempro', '!=', 'null')
+        // ->where('s.no_statusAkses', '=', 1)
+        // ->orWhere('s.no_statusAkses', '=', 2)
+        // ->distinct()->orderBy('tanggal_sempro', 'ASC')
+        // ->get();
+        $query = DB::table('mahasiswas as m')
+            ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+            ->leftJoin('jadwal_semhas as js', 'm.nim', '=', 'js.nim')
+            ->leftJoin('skripsis as sk', 'm.nim', '=', 'sk.nim')
+            ->select('m.nim', 'm.nama', 'js.tanggal_semhas', 'js.waktu', 'js.tempat')
+            ->where('m.status', '=', 'aktif', 'and', 'js.tanggal_semhas', '!=', 'null')
+            ->where('s.no_statusAkses', '=', 3)
+            ->orWhere('s.no_statusAkses', '=', 4)
+            ->distinct()->orderBy('tanggal_semhas', 'ASC')
+            ->get();
+
+        $mahasiswas = DB::table('mahasiswas as m')
+            ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+            ->leftJoin('jadwal_semhas as js', 'm.nim', '=', 'js.nim')
+            ->select('m.nim', 'm.nama', 'js.tanggal_semhas', 'js.waktu', 'js.tempat')
+            ->where('m.status', '=', 'aktif')
+            ->where('s.no_statusAkses', '=', 3)
+            ->orWhere('s.no_statusAkses', '=', 4)
+            ->orderBy('js.tanggal_semhas', 'DESC')
+            ->paginate(10);
+        return view('pegawai_prodi/semhas_penjadwalan', compact('mahasiswas', 'query'));
+    }
+
+    public function store_jd_sempro_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'date'     => 'required',
+            'waktu'    => 'required',
+            'tempat'   => 'required|min:6|max:64'
+        ]);
+
+        $jadwal_sempro = new JadwalSempro;
+        $jadwal_sempro->nim = $request->nim;
+        $jadwal_sempro->tanggal_sempro = $request->date;
+        $jadwal_sempro->waktu = $request->waktu;
+        $jadwal_sempro->tempat = $request->tempat;
+        $jadwal_sempro->save();
+        // mengubah status akses
+        if ((Skripsi::where('nim', $request->nim)->count()) > 0) {
+            DB::select("CALL tahapKedua($request->nim)");
+            return redirect('/pegawai_prodi/sempro_penjadwalan')->with('success_add_sempro', 'Jadwal Seminar Proposal berhasil ditambahkan!');
+        } else {
+            return redirect('/pegawai_prodi/sempro_penjadwalan')->with('success_add_sempro', 'Jadwal Seminar Proposal berhasil ditambahkan! Daftarkan data skripsi agar mahasiswa dapat melanjutkan proses administrasi.');
+        }
+    }
+
+    public function delete_jd_sempro_pegawai(Request $request)
+    {
+        DB::select("CALL tahapPertama($request->nim)");
+        JadwalSempro::where('nim', $request->nim)->delete();
+        return redirect('/pegawai_prodi/sempro_penjadwalan')->with('success_delete_jd_sempro', 'Jadwal seminar proposal berhasil dihapus!');
+    }
+
+    public function store_new_jd_sempro_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'date'     => 'required',
+            'waktu'    => 'required',
+            'tempat'   => 'required|min:10|max:64'
+        ]);
+
+        JadwalSempro::where('nim', $request->nim)->update([
+            'tanggal_sempro'  => $request->date,
+            'waktu'           => $request->waktu,
+            'tempat'          => $request->tempat,
+        ]);
+
+        return redirect('/pegawai_prodi/sempro_penjadwalan')->with('success_edit_jd_sempro', 'Jadwal seminar proposal berhasil diubah!');
+    }
+
+    public function add_jd_sempro_pegawai(Request $request)
+    {
+        $mahasiswa = DB::table('mahasiswas as m')
+            ->where('nim', $request->nim)
+            ->select('m.nim', 'm.nama')
+            ->first();
+        return view('pegawai_prodi/add_jd_sempro_pegawai', compact('mahasiswa'));
+    }
+
+    public function edit_jd_sempro_pegawai(Request $request)
+    {
+        // return 'Edit Jadwal Sempro pegawai';
+        $nama = $request->nama;
+        $jadwal = JadwalSempro::where('nim', $request->nim)->select('nim', 'tanggal_sempro', 'waktu', 'tempat')->first();
+        return view('pegawai_prodi/edit_jd_sempro_pegawai', compact('nama', 'jadwal'));
+    }
+
+    public function cetakJadwalSempro_pegawai(Request $request)
+    {
+        $tanggal_sempro = $request->tanggal_sempro;
+
+        $query = DB::table('v_jdSempro as js')
+            ->where('js.tanggal_sempro', '=', $tanggal_sempro)
+            ->get();
+
+        return view('admin.berkas.pesertaSempro', compact('query'));
+    }
+
+    //INI MON
+    public function cetakUndanganSempro_pegawai(Request $request)
+    {
+        $tanggal_sempro = $request->tanggal_sempro;
+
+        $query = DB::table('v_jdSempro as js')
+            ->where('js.tanggal_sempro', '=', $tanggal_sempro)
+            ->get();
+
+        return view('admin.berkas.undangan_sempro', compact('query'));
+    }
+
+    public function uji_kelayakan_penjadwalan()
+    {
+        return 'Uji Kelayakan Penjadwalan';
+    }
+
+    public function sempro_penjadwalan()
+    {
+        $mahasiswas = DB::table('mahasiswas as m')
+            ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+            ->leftJoin('jadwal_sempros as js', 'm.nim', '=', 'js.nim')
+            ->leftJoin('skripsis as sp', 'm.nim', '=', 'sp.nim')
+            ->select('m.nim', 'm.nama', 'js.tanggal_sempro', 'js.waktu', 'js.tempat')
+            ->where('m.status', '=', 'aktif')
+            ->where('s.no_statusAkses', '=', 1)
+            ->orWhere('s.no_statusAkses', '=', 2)
+            ->orderBy('js.tanggal_sempro', 'DESC')
+            ->paginate(12);
+
+        $query = DB::table('mahasiswas as m')
+            ->leftJoin('status_akses as s', 'm.nim', '=', 's.nim')
+            ->leftJoin('jadwal_sempros as js', 'm.nim', '=', 'js.nim')
+            ->select('m.nim', 'm.nama', 'js.tanggal_sempro', 'js.waktu', 'js.tempat')
+            ->where('m.status', '=', 'aktif', 'and', 'js.tanggal_sempro', '!=', 'null')
+            ->where('s.no_statusAkses', '=', 1)
+            ->orWhere('s.no_statusAkses', '=', 2)
+            ->distinct()->orderBy('tanggal_sempro', 'ASC')
+            ->get();
+        // dd($query);
+
+        return view('pegawai_prodi/sempro_penjadwalan', compact('mahasiswas', 'query'));
+    }
+
+    public function pegawai_prodi()
+    {
+        return view('pegawai_prodi/dashboard');
+    }
+
+    public function daftar_exum_ditolak()
+    {
+        $exum = Exum::where('status', 'Ditolak')->get();
+        return view('kepala_laboratorium/daftar_exum_ditolak', compact('exum'));
+    }
+
+    public function daftar_exum_diterima()
+    {
+        $exum = Exum::where('status', 'Disetujui')->get();
+        return view('kepala_laboratorium/daftar_exum_diterima', compact('exum'));
+    }
+
+    public function kepala_lab_exum_setujui($nim)
+    {
+        $exum = Exum::where('nim', $nim)->first();
+        $exum_terima = DB::table('exums')->where('nim', $nim)->update(['status' => 'Disetujui']);
+        if ($exum_terima) {
+            return redirect()->route('kepala_lab_exum')->with('success_terima_exum', 'Exum Mahasiswa ' . $exum->nama_mhs . ' Disetujui');
+        } else {
+            return redirect()->route('kepala_lab_exum')->with('error_terima_exum', 'Data Gagal Diupdate');
+        }
+    }
+
+    public function kepala_lab_exum_tolak($nim)
+    {
+        $exum = Exum::where('nim', $nim)->first();
+        $exum_tolak = DB::table('exums')->where('nim', $nim)->update(['status' => 'Ditolak']);
+        if ($exum_tolak) {
+            return redirect()->route('kepala_lab_exum')->with('success_tolak_exum', 'Exum Mahasiswa ' . $exum->nama_mhs . ' Ditolak');
+        } else {
+            return redirect()->route('kepala_lab_exum')->with('error_tolak_exum', 'Data Gagal Diupdate');
+        }
+    }
+
+    public function kepala_lab_exum_download($nim)
+    {
+        $exum = Exum::where('nim', $nim)->first();
+        // download exum file from storage/app/exum folder
+        $file = storage_path('/app/public/exums/' . $exum->file_exum);
+        $headers = array(
+            'Content-Type: application/pdf',
+        );
+        return Response::download($file, $exum->file_exum, $headers);
+    }
+
+    public function kepala_lab_exum()
+    {
+        $exum = Exum::where('status', 'Belum Diperiksa')->get();
+        return view('kepala_laboratorium/kepala_lab_exum', compact('exum'));
+    }
+
+    public function kepala_laboratorium()
+    {
+        return view('kepala_laboratorium/dashboard');
+    }
+
+    public function penguji_nilai_uji_kelayakan()
+    {
+        $mahasiswa = DB::table('mahasiswas')
+            ->join('dosen_pengujis', 'mahasiswas.nim', '=', 'dosen_pengujis.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama')
+            ->where('dosen_pengujis.nip_penguji1', '=', Auth::user()->username)
+            ->get();
+        $data = DB::table('mahasiswas as m')
+            ->leftJoin('v_dosen_penguji as v', 'm.nim', '=', 'v.nim')
+            ->leftjoin('v_dosbing as f', 'm.nim', '=', 'f.nim')
+            ->select('m.nim', 'm.nama', 'f.nip_dosbing1', 'f.nama_dosbing1', 'f.nip_dosbing2', 'f.nama_dosbing2', 'v.nip_dosen_penguji1', 'v.nama_dosen_penguji1', 'v.nip_dosen_penguji2', 'v.nama_dosen_penguji2')
+            ->where('v.nip_dosen_penguji1', '=', Auth::user()->username)
+            ->orWhere('v.nip_dosen_penguji2', '=', Auth::user()->username)
+            ->get();
+        return view('dosen_penguji/penguji_nilai_uji_kelayakan', compact('data', 'mahasiswa'));
+    }
+
+    public function store_nilai_uji_kelayakan_penguji(Request $request)
+    {
+        //-- 1	Judul Skripsi enum(terima, perbaiki, ganti)
+        //--  catatan_judul_skripsi text
+        //-- 2	Latar Belakang enum(terima, perbaiki, ganti)
+        //--  catatan_latar_belakang text
+        //-- 3	Rumusan Masalah enum(terima, perbaiki, ganti)
+        //-- catatan_rumusan_masalah text
+        //-- 4	Landasan Teori enum(terima, perbaiki, ganti)
+        //-- catatan_landasan_teoris text
+        //-- 5	Penelitian Terdahulu enum(terima, perbaiki, ganti)
+        //-- catatan_penelitian_terdahulu text
+        //-- 6	Data yang Digunakan enum(terima, perbaiki, ganti)
+        //-- catatan_data_yang_digunakan text
+        //-- 7	Metodologi (Arsitektur Umum) enum(terima, perbaiki, ganti)
+        //-- catatan_metodologi text
+        //-- 8	Daftar Pustaka ) enum(terima, perbaiki, ganti)
+        //-- catatan_daftar_pustaka text
+
+        $n1                                 = new NilaiUjiKelayakan;
+        $n1->nim                            = $request->nim;
+        $n1->nip                            = Auth::user()->username;
+        $n1->judul_skripsi                  = $request->n1;
+        $n1->catatan_judul_skripsi          = $request->catatan_judul_skripsi;
+        $n1->latar_belakang                 = $request->n2;
+        $n1->catatan_latar_belakang         = $request->catatan_latar_belakang;
+        $n1->rumusan_masalah                = $request->n3;
+        $n1->catatan_rumusan_masalah        = $request->catatan_rumusan_masalah;
+        $n1->landasan_teori                 = $request->n4;
+        $n1->catatan_landasan_teoris        = $request->catatan_landasan_teoris;
+        $n1->penelitian_terdahulu           = $request->n5;
+        $n1->catatan_penelitian_terdahulu   = $request->catatan_penelitian_terdahulu;
+        $n1->data_yang_digunakan            = $request->n6;
+        $n1->catatan_data_yang_digunakan    = $request->catatan_data_yang_digunakan;
+        $n1->metodologi                     = $request->n7;
+        $n1->catatan_metodologi             = $request->catatan_metodologi;
+        $n1->daftar_pustaka                 = $request->n8;
+        $n1->catatan_daftar_pustaka         = $request->catatan_daftar_pustaka;
+        $n1->tanggal                        = $request->tanggal;
+        $n1->waktu                          = $request->waktu;
+        $n1->save();
+
+        if ($n1) {
+            return redirect('penguji/penguji_nilai_uji_kelayakan')->with('success_uji_kelayakan', 'Data Nilai Uji Kelayakan Proposal Berhasil Disimpan');
+        } else {
+            return redirect('penguji/penguji_nilai_uji_kelayakan')->with('error_uji_kelayakan', 'Data Nilai Uji Kelayakan Proposal Gagal Disimpan');
+        }
+    }
+
+    public function penguji_nilai_semhas()
+    {
+        $mahasiswa = DB::table('mahasiswas')
+            ->join('dosen_pengujis', 'mahasiswas.nim', '=', 'dosen_pengujis.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama')
+            ->where('dosen_pengujis.nip_penguji1', '=', Auth::user()->username)
+            ->get();
+        $data = DB::table('mahasiswas as m')
+            ->leftJoin('v_dosen_penguji as v', 'm.nim', '=', 'v.nim')
+            ->leftjoin('v_dosbing as f', 'm.nim', '=', 'f.nim')
+            ->select('m.nim', 'm.nama', 'f.nip_dosbing1', 'f.nama_dosbing1', 'f.nip_dosbing2', 'f.nama_dosbing2', 'v.nip_dosen_penguji1', 'v.nama_dosen_penguji1', 'v.nip_dosen_penguji2', 'v.nama_dosen_penguji2')
+            ->where('v.nip_dosen_penguji1', '=', Auth::user()->username)
+            ->orWhere('v.nip_dosen_penguji2', '=', Auth::user()->username)
+            ->get();
+        return view('dosen_penguji/penguji_nilai_semhas', compact('data', 'mahasiswa'));
+    }
+
+    public function store_nilai_semhas_penguji(Request $request)
+    {
+        $n1                                 = new NilaiSemhas;
+        $n1->nim                             = $request->nim;
+        $n1->nip                             = Auth::user()->username;
+        $n1->abstrak                         = floatval($request->n1);
+        $n1->pendahuluan                     = floatval($request->n2);
+        $n1->landasan_teori                  = floatval($request->n3);
+        $n1->metodologi                      = floatval($request->n4);
+        $n1->implementasi                    = floatval($request->n5);
+        $n1->kesimpulan                      = floatval($request->n6);
+        $n1->kemampuan_mengemukakan_substansi = floatval($request->n7);
+        $n1->tanggal                         = $request->tanggal;
+        $n1->save();
+
+        if ($n1) {
+            return redirect('penguji/penguji_nilai_semhas')->with('success_nilai_semhas', 'Nilai Seminar Hasil Berhasil Ditambahkan');
+        } else {
+            return redirect('penguji/penguji_nilai_semhas')->with('error_nilai_semhas', 'Nilai Seminar Hasil Gagal Ditambahkan');
+        }
+    }
+
+    public function penguji_nilai_sidang()
+    {
+        $mahasiswa = DB::table('mahasiswas')
+            ->join('dosen_pengujis', 'mahasiswas.nim', '=', 'dosen_pengujis.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama')
+            ->where('dosen_pengujis.nip_penguji1', '=', Auth::user()->username)
+            ->orWhere('dosen_pengujis.nip_penguji2', '=', Auth::user()->username)
+            ->get();
+        return view('dosen_penguji/penguji_nilai_sidang', compact('mahasiswa'));
+    }
+
+    public function store_nilai_sidang_penguji(Request $request)
+    {
+        // return $request->all();
+        $n1                                  = new NilaiSidang;
+        $n1->nim                             = $request->nim;
+        $n1->nip                             = Auth::user()->username;
+        $n1->sistematika_penulisan           = $request->n1 ? floatval($request->n1) : null;
+        $n1->substansi                       = $request->n2 ? floatval($request->n2) : null;
+        $n1->kemampuan_menguasai_substansi   = $request->n3 ? floatval($request->n3) : null;
+        $n1->kemampuan_mengemukakan_pendapat = $request->n4 ? floatval($request->n4) : null;
+        $n1->tanggal                         = $request->tanggal;
+        $n1->waktu                           = $request->waktu;
+        $n1->save();
+
+        if ($n1) {
+            return redirect('penguji/penguji_nilai_sidang')->with('success_nilai_sidang', 'Nilai Sidang Berhasil Ditambahkan');
+        } else {
+            return redirect('penguji/penguji_nilai_sidang')->with('error_nilai_sidang', 'Nilai Sidang Gagal Ditambahkan');
+        }
+    }
+
+    public function jadwal_kelayakan_isi_proposal()
+    {
+        $nip = Dosen::where('id_user', Auth::user()->id)->select('nip')->first();
+        $query = DB::table('jadwal_uji_kelayakans')
+            ->join('mahasiswas', 'jadwal_uji_kelayakans.nim', '=', 'mahasiswas.nim')
+            ->join('dosen_pengujis', 'mahasiswas.nim', '=', 'dosen_pengujis.nim')
+            ->join('skripsis', 'mahasiswas.nim', '=', 'skripsis.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama', 'jadwal_uji_kelayakans.tanggal', 'jadwal_uji_kelayakans.waktu', 'jadwal_uji_kelayakans.tempat', 'skripsis.judul_skripsi')
+            ->where('dosen_pengujis.nip_penguji1', '=', $nip->nip)
+            ->orWhere('dosen_pengujis.nip_penguji2', '=', $nip->nip)
+            ->get();
+
+        return view('dosen_penguji.jadwal_kelayakan_isi_proposal', compact('query'));
+    }
+
+    public function jadwal_semhas_penguji()
+    {
+        $nip = Dosen::where('id_user', Auth::user()->id)->select('nip')->first();
+        $query = DB::table('jadwal_semhas')
+            ->join('mahasiswas', 'jadwal_semhas.nim', '=', 'mahasiswas.nim')
+            ->join('dosen_pengujis', 'mahasiswas.nim', '=', 'dosen_pengujis.nim')
+            ->join('skripsis', 'mahasiswas.nim', '=', 'skripsis.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama', 'jadwal_semhas.tanggal_semhas', 'jadwal_semhas.waktu', 'jadwal_semhas.tempat', 'skripsis.judul_skripsi')
+            ->where('dosen_pengujis.nip_penguji1', '=', $nip->nip)
+            ->orWhere('dosen_pengujis.nip_penguji2', '=', $nip->nip)
+            ->get();
+
+        return view('dosen_penguji.jadwal_semhas_penguji', compact('query'));
+    }
+
+    public function jadwal_sidang_penguji()
+    {
+        $nip = Dosen::where('id_user', Auth::user()->id)->select('nip')->first();
+        $query = DB::table('jadwal_sidangs')
+            ->join('mahasiswas', 'jadwal_sidangs.nim', '=', 'mahasiswas.nim')
+            ->join('dosen_pengujis', 'mahasiswas.nim', '=', 'dosen_pengujis.nim')
+            ->join('skripsis', 'mahasiswas.nim', '=', 'skripsis.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama', 'jadwal_sidangs.tanggal_sidang', 'jadwal_sidangs.waktu', 'jadwal_sidangs.tempat', 'skripsis.judul_skripsi')
+            ->where('dosen_pengujis.nip_penguji1', '=', $nip->nip)
+            ->orWhere('dosen_pengujis.nip_penguji2', '=', $nip->nip)
+            ->get();
+
+        return view('dosen_penguji.jadwal_sidang_penguji', compact('query'));
+    }
+
+    public function detail_mahasiswa_penguji($nim)
+    {
+        $query = DB::table('v_detail_mhs')->where('nim', $nim)->get();
+        // $query = collect($query);
+        // dd($query);
+
+        // $progres = DB::table('v_progress_skripsi')->where('nim', $nim)
+        //     ->select('persentase_skripsi', 'keterangan')
+        //     ->get();
+
+        return view('dosen_penguji.detail_mahasiswa_penguji', compact('query'));
+    }
+
+    public function daftar_mahasiswa_penguji()
+    {
+        // $nip = Dosen::where('id_user', Auth::user()->id)->select('nip')->first();
+        // $nim = DB::table('v_dosen_penguji')
+        //     ->select('nim')
+        //     ->where('nip_dosen_penguji1', '=', Auth::user()->username)
+        //     ->orWhere('nip_dosen_penguji2', '=', Auth::user()->username)
+        //     ->get();
+
+        // Ubah nim ke string array
+        // $nim = json_decode($nim, true);
+        // $nim = array_column($nim, 'nim');
+
+        $mahasiswa = DB::table('v_dosen_penguji as d')
+            ->select('d.nim', 'd.nama_mhs')
+            ->where('nip_dosen_penguji1', '=', Auth::user()->username)
+            ->orWhere('nip_dosen_penguji2', '=', Auth::user()->username)
+            ->get();
+
+        return view('dosen_penguji.daftar_mahasiswa_penguji', compact('mahasiswa'));
+    }
 
     public function v_nilai_uji_program()
     {
@@ -30,11 +671,18 @@ class DosenController extends Controller
             ->join('dosen_pembimbings', 'mahasiswas.nim', '=', 'dosen_pembimbings.nim')
             ->select('mahasiswas.nim', 'mahasiswas.nama')
             ->where('dosen_pembimbings.nip_dosbing1', '=', Auth::user()->username)
+            ->orWhere('dosen_pembimbings.nip_dosbing2', '=', Auth::user()->username)
             ->get();
         return view('dosen/v_nilai_uji_program', compact('mahasiswa'));
     }
     public function v_nilai_semhas()
     {
+        $mahasiswa = DB::table('mahasiswas')
+            ->join('dosen_pembimbings', 'mahasiswas.nim', '=', 'dosen_pembimbings.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama')
+            ->where('dosen_pembimbings.nip_dosbing1', '=', Auth::user()->username)
+            ->orWhere('dosen_pembimbings.nip_dosbing2', '=', Auth::user()->username)
+            ->get();
         $data = DB::table('mahasiswas as m')
             ->leftJoin('v_dosen_penguji as v', 'm.nim', '=', 'v.nim')
             ->leftjoin('v_dosbing as f', 'm.nim', '=', 'f.nim')
@@ -43,11 +691,17 @@ class DosenController extends Controller
             ->orWhere('f.nip_dosbing2', '=', Auth::user()->username)
             ->get();
         // dd($data);
-        return view('dosen/v_nilai_semhas', compact('data'));
+        return view('dosen/v_nilai_semhas', compact('data', 'mahasiswa'));
     }
     public function v_nilai_sidang(Request $request)
     {
-        return 'v_nilai_sidang';
+        $mahasiswa = DB::table('mahasiswas')
+            ->join('dosen_pembimbings', 'mahasiswas.nim', '=', 'dosen_pembimbings.nim')
+            ->select('mahasiswas.nim', 'mahasiswas.nama')
+            ->where('dosen_pembimbings.nip_dosbing1', '=', Auth::user()->username)
+            ->orWhere('dosen_pembimbings.nip_dosbing2', '=', Auth::user()->username)
+            ->get();
+        return view('dosen/v_nilai_sidang', compact('mahasiswa'));
     }
 
     public function store_nilai_uji_program(Request $request)
@@ -56,31 +710,34 @@ class DosenController extends Controller
         //     'nim' => 'required',
         //     'nilai' => 'required',
         // ]);
-        $n                                  = new NilaiUjiProgram;
-        $n->nim                             = $request->nim;
-        $n->nip                             = Auth::user()->username;
-        if ($request->n1 != NULL) {
-            $n->nilai_kemampuan_dasar_program   = floatval($request->n1);
-        }
-        if ($request->n2 != NULL) {
-            $n->nilai_kecocokan_algoritma       = floatval($request->n2);
-        }
-        if ($request->n3 != NULL) {
-            $n->nilai_penguasaan_program        = floatval($request->n3);
-        }
-        if ($request->n4 != NULL) {
-            $n->nilai_penguasaan_ui             = floatval($request->n4);
-        }
-        if ($request->n5 != NULL) {
-            $n->nilai_validasi_output           = floatval($request->n5);
-        }
+        // dd($request->all());
+        $check_duplicate = NilaiUjiProgram::where('nim', $request->nim)->first();
+        if ($check_duplicate != NULL) {
+            return redirect()->route('v_nilai_uji_program')->with('error_nilai_uji_program', 'Nilai Uji Program Mahasiswa ini Sudah Ada');
+        } else {
+            $n                                  = new NilaiUjiProgram;
+            $n->nim                             = $request->nim;
+            $n->nip                             = Auth::user()->username;
+            if ($request->n1 != NULL) {
+                $n->nilai_kemampuan_dasar_program   = floatval($request->n1);
+            }
+            if ($request->n2 != NULL) {
+                $n->nilai_kecocokan_algoritma       = floatval($request->n2);
+            }
+            if ($request->n3 != NULL) {
+                $n->nilai_penguasaan_program        = floatval($request->n3);
+            }
+            if ($request->n4 != NULL) {
+                $n->nilai_penguasaan_ui             = floatval($request->n4);
+            }
+            if ($request->n5 != NULL) {
+                $n->nilai_validasi_output           = floatval($request->n5);
+            }
 
-        $n->total                           = floatval($request->n6);
-
-        $n->tanggal                         = $request->tanggal;
-        $n->waktu                           = $request->waktu;
-        $n->save();
-
+            $n->tanggal                         = $request->tanggal;
+            $n->waktu                           = $request->waktu ?? NULL;
+            $n->save();
+        }
         if ($n) {
             return redirect()->route('v_nilai_uji_program')->with('success_nilai_uji_program', 'Nilai Uji Program Berhasil Ditambahkan');
         } else {
@@ -88,6 +745,57 @@ class DosenController extends Controller
         }
     }
 
+    public function store_nilai_semhas(Request $request)
+    {
+        // dd($request->nim);
+        $check_duplicate = NilaiSemhas::where('nim', $request->nim)->first();
+        if ($check_duplicate != NULL) {
+            return redirect('dosen/v_nilai_semhas')->with('error_nilai_semhas', 'Nilai Seminar Hasil mahasiswa ini Sudah Ada');
+        } else {
+            $n1                                 = new NilaiSemhas;
+            $n1->nim                             = $request->nim;
+            $n1->nip                             = Auth::user()->username;
+            $n1->abstrak                         = floatval($request->n1);
+            $n1->pendahuluan                     = floatval($request->n2);
+            $n1->landasan_teori                  = floatval($request->n3);
+            $n1->metodologi                      = floatval($request->n4);
+            $n1->implementasi                    = floatval($request->n5);
+            $n1->kesimpulan                      = floatval($request->n6);
+            $n1->kemampuan_mengemukakan_substansi = floatval($request->n7);
+            $n1->tanggal                         = $request->tanggal;
+            $n1->waktu                           = $request->waktu ?? NULL;
+            $n1->save();
+        }
+        if ($n1) {
+            return redirect('dosen/v_nilai_semhas')->with('success_nilai_semhas', 'Nilai Seminar Hasil Berhasil Ditambahkan');
+        } else {
+            return redirect('dosen/v_nilai_semhas')->with('error_nilai_semhas', 'Nilai Seminar Hasil Gagal Ditambahkan');
+        }
+    }
+
+    public function store_nilai_sidang_dosen(Request $request)
+    {
+        $check_duplicate = NilaiSidang::where('nim', $request->nim)->first();
+        if ($check_duplicate != NULL) {
+            return redirect('dosen/v_nilai_sidang')->with('error_nilai_sidang', 'Nilai Sidang mahasiswa ini Sudah Ada');
+        } else {
+            $n1                                  = new NilaiSidang;
+            $n1->nim                             = $request->nim;
+            $n1->nip                             = Auth::user()->username;
+            $n1->sistematika_penulisan           = $request->n1 ? floatval($request->n1) : null;
+            $n1->substansi                       = $request->n2 ? floatval($request->n2) : null;
+            $n1->kemampuan_menguasai_substansi   = $request->n3 ? floatval($request->n3) : null;
+            $n1->kemampuan_mengemukakan_pendapat = $request->n4 ? floatval($request->n4) : null;
+            $n1->tanggal                         = $request->tanggal;
+            $n1->waktu                           = $request->waktu;
+            $n1->save();
+        }
+        if ($n1) {
+            return redirect('dosen/v_nilai_sidang')->with('success_nilai_sidang', 'Nilai Sidang Berhasil Ditambahkan');
+        } else {
+            return redirect('dosen/v_nilai_sidang')->with('error_nilai_sidang', 'Nilai Sidang Gagal Ditambahkan');
+        }
+    }
 
 
     public function mhs_bimbingan()
@@ -104,11 +812,22 @@ class DosenController extends Controller
         // dd($nim);
         // keterangan -> v_progress_skripsi
         // nama_mhs -> v_mhs_bimbingan
-        $mahasiswa = DB::table('v_dosbing as d')
-            ->join('v_progress_skripsi as p', 'd.nim', '=', 'p.nim')
-            ->select('d.nim', 'd.nama_mhs', 'p.keterangan')
-            ->whereIn('d.nim', $nim)
+        // $mahasiswa = DB::table('v_mhs_bimbingan')
+        //     ->join('v_progress_skripsi', 'v_mhs_bimbingan.nim', '=', 'v_progress_skripsi.nim')
+        //     ->select('v_mhs_bimbingan.nim', 'v_mhs_bimbingan.nama_mhs', 'v_progress_skripsi.keterangan')
+        //     ->where('v_mhs_bimbingan.nip', '=', Auth::user()->username)
+        //     ->get();
+        $mahasiswa = DB::table('v_mhs_bimbingan')
+            ->select('v_mhs_bimbingan.nim', 'v_mhs_bimbingan.nama_mhs')
+            ->where('v_mhs_bimbingan.nip', '=', Auth::user()->username)
             ->get();
+        // $mahasiswa = DB::table('dosen_pembimbings as d')
+        //     ->join('mahasiswas as mhs', 'd.nim', '=', 'mhs.nim ')
+        //     ->join('v_progress_skripsi as p', 'd.nim', '=', 'p.nim')
+        //     ->select('d.nim', 'mhs.nama as nama_mhs', 'p.keterangan')
+        //     ->whereIn('d.nim', $nim)
+        //     ->get();
+
 
         return view('dosen/mhs_bimbingan', compact('mahasiswa'));
     }
@@ -119,6 +838,7 @@ class DosenController extends Controller
             ->join('dosen_pembimbings', 'mahasiswas.nim', '=', 'dosen_pembimbings.nim')
             ->select('mahasiswas.nim', 'mahasiswas.nama')
             ->where('dosen_pembimbings.nip_dosbing1', '=', Auth::user()->username)
+            ->orWhere('dosen_pembimbings.nip_dosbing2', '=', Auth::user()->username)
             ->get();
         return view('dosen.bimbingan_sempro', compact('mahasiswa'));
     }
@@ -158,6 +878,7 @@ class DosenController extends Controller
             ->join('dosen_pembimbings', 'mahasiswas.nim', '=', 'dosen_pembimbings.nim')
             ->select('mahasiswas.nim', 'mahasiswas.nama')
             ->where('dosen_pembimbings.nip_dosbing1', '=', Auth::user()->username)
+            ->orWhere('dosen_pembimbings.nip_dosbing2', '=', Auth::user()->username)
             ->get();
         return view('dosen.bimbingan_semhas', compact('mahasiswa'));
     }
@@ -187,6 +908,7 @@ class DosenController extends Controller
             ->join('dosen_pembimbings', 'mahasiswas.nim', '=', 'dosen_pembimbings.nim')
             ->select('mahasiswas.nim', 'mahasiswas.nama')
             ->where('dosen_pembimbings.nip_dosbing1', '=', Auth::user()->username)
+            ->orWhere('dosen_pembimbings.nip_dosbing2', '=', Auth::user()->username)
             ->get();
         return view('dosen.bimbingan_sidang', compact('mahasiswa'));
     }
@@ -263,7 +985,8 @@ class DosenController extends Controller
                     ->where('nim', '=', $this->nim);
             })->get();
 
-        return view('dosen.berkas.penilaianKelayakanSempro', compact('mahasiswa', 'query', 'skripsi'));
+        $nilai_kelayakan = DB::table('nilai_uji_kelayakans')->where('nim', $nim)->get();
+        return view('dosen.berkas.penilaianKelayakanSempro', compact('mahasiswa', 'query', 'skripsi', 'nilai_kelayakan'));
     }
 
     public function berkasPersetujuanSemhas($nim)
@@ -374,6 +1097,11 @@ class DosenController extends Controller
         return view('dosen.dashboard');
     }
 
+    public function penguji()
+    {
+        return view('dosen_penguji.dashboard');
+    }
+
     //INI MON
     public function mahasiswaTA()
     {
@@ -409,9 +1137,10 @@ class DosenController extends Controller
     //INI MON
     public function detailMahasiswa($nim)
     {
-        $query = DB::table('v_detail_mhs')->where('nim', $nim)
-            ->select('nama', 'nim', 'angkatan', 'judul_skripsi', 'dosen_pembimbing')
-            ->get();
+        $query = DB::table('v_detail_mhs')->where('nim', $nim)->get();
+        // $query = collect($query);
+        // dd($query);
+
         $progres = DB::table('v_progress_skripsi')->where('nim', $nim)
             ->select('persentase_skripsi', 'keterangan')
             ->get();

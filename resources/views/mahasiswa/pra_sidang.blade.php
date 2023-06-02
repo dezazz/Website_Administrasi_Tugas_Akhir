@@ -86,13 +86,19 @@
                             Silahkan cetak formulir atau preview untuk memastikan
                             data Anda sudah benar sebelum mengunduh formulir. </p>
 
-                        @if ($mhs->no_statusAkses > 4)
+                        @if ($mhs->no_statusAkses > 4 && $bimbingan_check > 0)
                             <div class="d-grid gap-2 d-md-flex justify-content">
                                 <a href="{{ '/mahasiswa/lembar_kendali_sidang' }}" class="btn btn-success btn-sm"
                                     target="blank">
                                     <i class="bi bi-printer-fill"></i> Cetak </a>
                             </div>
                         @else
+                            <div class="alert alert-info alert-dismissible show fade">
+                                <div class="alert-body">
+                                    <i>Pemberitahuan!</i> Dosen pembimbing belum mengisi lembar kendali bimbingan
+                                    sidang meja hijau.
+                                </div>
+                            </div>
                             <div class="d-grid gap-2 d-md-flex justify-content">
                                 <a href="#" class="btn btn-success btn-sm disabled" target="blank">
                                     <i class="bi bi-printer-fill"></i> Cetak </a>
@@ -114,11 +120,16 @@
                                     <i class="bi bi-eye"></i> Lihat Jadwal </a>
                             </div>
                         @else
+                            {{-- pemberitahuan jadwal belum ditentukan --}}
+                            <div class="alert alert-info alert-dismissible show fade">
+                                <div class="alert-body text-center">
+                                    <i>Pemberitahuan!</i> Jadwal sidang meja hijau belum ditentukan.
+                                </div>
+                            </div>
                             <div class="d-grid gap-2 d-md-flex justify-content">
                                 <!-- preview akan membawa mahasiswa ke halaman form yang ingin diunduh -->
-                                <p> Jadwal sidang belum ditentukan </p>
-                                {{-- <a href="#" class="btn btn-primary btn-sm disabled" target="blank"> <i
-                                        class="bi bi-eye"></i> Lihat Jadwal </a> --}}
+                                <a href="#" class="btn btn-primary btn-sm disabled"><i class="bi bi-eye"></i>
+                                    Cek Jadwal</button></a>
                             </div>
                         @endif
                     </div>

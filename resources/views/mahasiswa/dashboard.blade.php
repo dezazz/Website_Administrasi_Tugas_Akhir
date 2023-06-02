@@ -69,8 +69,16 @@
                 </div>
             </div>
 
+
             <!-- PROFILE - PROGRESS -->
             <div class="col-md-8 col-sm-12">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <h4 class="card-title text-center mt-1">Selamat Datang di Sistem Administrasi Tugas Akhir</h4>
+                        </div>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-content">
                         <br>
@@ -112,177 +120,8 @@
                         </div>
                     </div>
                 </div>
-                <!-- SHORTCUT 1 -->
-                <div class="card">
-                    <div class="card-content">
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title"><a href="/mahasiswa/pra_sempro">Seminar Proposal</a></h4>
-                                        <p class="card-text">
-                                            1. Pengajuan Calon Pembimbing <br>
-                                            2. Pengajuan Executive Summary <br>
-                                            3. Pengajuan Berkas Seminar Proposal<br>
-                                            4. Pengecekan Jadwal Seminar <br>
-                                            5. Bimbingan Seminar Proposal<br>
-                                            6. Pengajuan dan Perbaiki Judul <br>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END SHORTCUT 1 -->
-                {{-- Perbaiki untuk keterangan menu lain --}}
-                <!-- SHORTCUT 2 -->
-                <div class="card">
-                    <div class="card-content">
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title"><a href="/mahasiswa/pra_semhas">Seminar Hasil</a></h4>
-                                        <p class="card-text">
-                                            1. Pengajuan Calon Pembimbing <br>
-                                            2. Pengajuan Executive Summary <br>
-                                            3. Pengajuan Berkas Seminar Proposal<br>
-                                            4. Pengecekan Jadwal Seminar <br>
-                                            5. Bimbingan Seminar Proposal<br>
-                                            6. Pengajuan dan Perbaiki Judul <br>
-                                        </p>
+                {{-- beautiful card SELAMAT DATANG DI SISTEM ADMINISTRASI TUGAS AKHIR --}}
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END SHORTCUT 2 -->
-                <!-- SHORTCUT 3 -->
-                <div class="card">
-                    <div class="card-content">
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title"><a href="/mahasiswa/pra_sidang">Sidang Meja Hijau</a></h4>
-                                        <p class="card-text">
-                                            1. Pengajuan Calon Pembimbing <br>
-                                            2. Pengajuan Executive Summary <br>
-                                            3. Pengajuan Berkas Seminar Proposal<br>
-                                            4. Pengecekan Jadwal Seminar <br>
-                                            5. Bimbingan Seminar Proposal<br>
-                                            6. Pengajuan dan Perbaiki Judul <br>
-                                        </p>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END SHORTCUT 1 -->
-                <!-- SHORTCUT 1 -->
-                <div class="card">
-                    <div class="card-content">
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title"><a href="/mahasiswa/pasca_sidang">Pasca Sidang Meja Hijau</a>
-                                        </h4>
-                                        <p class="card-text">
-                                            1. Pengajuan Calon Pembimbing <br>
-                                            2. Pengajuan Executive Summary <br>
-                                            3. Pengajuan Berkas Seminar Proposal<br>
-                                            4. Pengecekan Jadwal Seminar <br>
-                                            5. Bimbingan Seminar Proposal<br>
-                                            6. Pengajuan dan Perbaiki Judul <br>
-                                        </p>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- END SHORTCUT 1 -->
             </div>
-            <!-- END PROFILE -->
-
-            {{-- <div class="row">
-                <div class="col-xl-8">
-                    <div class="row">
-                        <!-- SHORTCUT 1 -->
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Pra Seminar Proposal</h4>
-                                        <p class="card-text">
-                                            Berkas administrasi pra seminar proposal
-                                        </p>
-                                        <a href="/mahasiswa/pra_sempro" class="btn btn-primary btn-sm">Akses</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- END SHORTCUT 1 -->
-
-                        <!-- SHORTCUT 2 -->
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Pra Seminar Hasil</h4>
-                                        <p class="card-text">
-                                            Berkas Administrasi Pra Seminar Hasil
-                                        </p>
-                                        <a href="/mahasiswa/pra_semhas" class="btn btn-primary btn-sm"> Akses</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- END SHORTCUT 2 -->
-
-                        <!-- SHORTCUT 3 -->
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Pra Sidang Meja Hijau</h4>
-                                        <p class="card-text">
-                                            Berkas Administrasi Pra Sidang Meja Hijau
-                                        </p>
-                                        <a href="/mahasiswa/pra_sidang" class="btn btn-primary btn-sm">Akses</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- END SHORTCUT 3 -->
-
-                        <!-- SHORTCUT 4 -->
-                        <div class="col-xl-6 col-md-6 col-sm-12">
-                            <div class="card">
-                                <div class="card-content">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Pasca Sidang Meja Hijau</h4>
-                                        <p class="card-text">
-                                            Proses lanjutan pra sidang meja hijau
-                                        </p>
-                                        <a href="pasca_meja_hijau" class="btn btn-primary btn-sm"> Akses</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- END SHORTCUT 4 -->
-                    </div>
-                </div>
-
-
-            </div> --}}
         </div>
-    </div>
-@endsection
+    @endsection

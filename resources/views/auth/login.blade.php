@@ -52,7 +52,7 @@
                                         </span>
                                     @enderror
                                 </div> --}}
-                                <div class="form-group mt-3 mb-2">
+                                <div class="form-group mt-3 mb-3">
                                     <input id="username" type="text"
                                         class="form-control @error('username') is-invalid @enderror" name="username"
                                         value="{{ old('username') }}" required autocomplete="username" autofocus>
@@ -68,7 +68,7 @@
                                     <input id="password" type="password"
                                         class="form-control @error('password') is-invalid @enderror" name="password"
                                         required autocomplete="current-password">
-                                    <label class="form-control-placeholder" for="password">Password</label>
+                                    <label class="form-control-placeholder mt-2" for="password">Password</label>
                                     @error('password')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>

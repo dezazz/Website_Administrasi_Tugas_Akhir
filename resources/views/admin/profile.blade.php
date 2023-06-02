@@ -4,163 +4,7 @@
     <title>Admin - Profil</title>
 @endsection
 
-@section('sidebar')
-    <li class="sidebar-item">
-        <a href="/admin/dashboard" class='sidebar-link'>
-
-            <span>Dashboard</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="{{ route('mhs_ta') }}" class='sidebar-link'>
-            <i class="bi bi-people-fill"></i>
-            <span>Mahasiswa TA</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('aktif') }}">Mahasiswa Aktif</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('alumni') }}">Lulus / Alumni</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Seminar Proposal</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_dosbing') }}">Dosen Pembimbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_skripsi') }}">Judul Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/validasi_sempro">Berkas Administrasi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="{{ route('prasemhas_menu') }}" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Seminar Hasil</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_dosenPenguji') }}">Dosen Penguji</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/validasi_semhas">Berkas Administrasi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item">
-        <a href="/admin/validasi_sidang" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Sidang Meja Hijau</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-person-badge-fill"></i>
-            <span>Manajemen User</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_admin">Admin</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_prodi">Prodi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_dosen">Dosen</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_mhs">Mahasiswa</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-pen-fill"></i>
-            <span>Penjadwalan</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_sempro') }}">Seminar Proposal</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_semhas') }}">Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_sidang') }}">Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clock-history"></i>
-            <span>Riwayat Aktivitas</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('log_pendaftaran_dosbing') }}">Riwayat Pendaftaran Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pengubahan_dosbing') }}">Riwayat Pengubahan Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_penghapusan_dosbing') }}">Riwayat Penghapusan Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pendaftaran_skripsi') }}">Riwayat Pendaftaran Judul Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pengubahan_skripsi') }}">Riwayat Pengubahan Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_penghapusan_skripsi') }}">Riwayat Penghapusan Skripsi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item active">
-        <a href="{{ route('profile_admin') }}" class='sidebar-link'>
-
-            <span>Profil</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub ">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clipboard-plus"></i>
-            <span>Input Nilai</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_IPK') }}">Input Nilai IPK</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_uji_program') }}">Input Nilai Uji Program</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_semhas') }}">Input Nilai Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('nilai_sidang_admin') }}">Input Nilai Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-@endsection
+@include('admin/sidebar')
 
 @section('content')
     <div class="page-heading">
@@ -168,14 +12,7 @@
             <div class="row">
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>Profil</h3>
-                    <p class="text-subtitle text-muted">Data Anda sebagai admin.</p>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('profile_admin') }}">Profil</a></li>
-                        </ol>
-                    </nav>
+                    {{-- <p class="text-subtitle text-muted">Data Anda sebagai admin.</p> --}}
                 </div>
             </div>
         </div>
@@ -186,9 +23,9 @@
                     <div class="row">
                         <div class="card card-outline-secondary">
                             <center>
-                                <img class="card-img-top img-fluid" src="../assets/images/staff.jpg" alt="lecturer_image"
+                                {{-- <img class="card-img-top img-fluid" src="../assets/images/staff.jpg" alt="lecturer_image"
                                     style="height: 500px;" />
-                                <br><br><br>
+                                <br><br><br> --}}
                                 <div class="col-xl-6 mb-6">
                                     <div class="table-responsive">
                                         @if (session('status'))
@@ -229,8 +66,8 @@
                                                     <label for="nama">Nama</label>
                                                 </div>
                                                 <div class="col-md-8 form-group">
-                                                    <input type="text" id="nama" class="form-control"
-                                                        name="nama" value="{{ Auth::user()->admin->nama }}">
+                                                    <input type="text" id="nama" class="form-control" name="nama"
+                                                        value="{{ Auth::user()->admin->nama }}">
                                                     @error('nama')
                                                         <div class="text-danger">{{ $message }}</div>
                                                     @enderror
@@ -245,22 +82,26 @@
                                                         <div class="text-danger">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <br><br><br>
-                                                <center>
+                                                <br><br>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4"></div>
+                                                <div class="col-md-8">
+
                                                     <table>
-                                                        <table>
-                                                            <td>
-                                                                <a href="/admin/dashboard" class="btn btn-success"><i
-                                                                        class="fa fa-arrow-left"></i>&nbsp;&nbsp;Kembali</a>
-                                                            </td>
-                                                            <td>
-                                                                <button type="submit" class="btn btn-primary"><i
-                                                                        class="fa fa-save"></i>&nbsp;&nbsp;Simpan
-                                                                    Perubahan</button><br>
-                                                            </td>
-                                                        </table>
+                                                        <td>
+                                                            <a href="/admin/dashboard" class="btn btn-success"><i
+                                                                    class="fa fa-arrow-left"></i>&nbsp;&nbsp;Kembali</a>
+                                                        </td>
+                                                        <td>
+                                                            <button type="submit" class="btn btn-primary"><i
+                                                                    class="fa fa-save"></i>&nbsp;&nbsp;Simpan
+                                                                Perubahan</button><br>
+                                                        </td>
                                                     </table>
-                                                </center>
+
+                                                </div>
                                             </div>
                                         </div>
                                     </form>

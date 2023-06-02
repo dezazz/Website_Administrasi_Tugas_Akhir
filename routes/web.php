@@ -1,11 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DosenController;
-use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\KaprodiController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\KepalaProdiController;
+use App\Http\Controllers\SekretarisProdiController;
 
 
 // LOGIN PAGE FOR FIRST TIME ARRIVAL
@@ -60,10 +62,24 @@ Route::post('/admin/delete_adm', [AdminController::class, 'delete_adm'])->middle
 
 Route::get('/admin/manajemen_prodi', [AdminController::class, 'manajemen_prodi'])->middleware('cekstatus:admin');
 Route::get('/admin/add_prodi', [AdminController::class, 'add_prodi'])->middleware('cekstatus:admin');
-Route::post('/admin/regis_prodi', [AdminController::class, 'store_prodi'])->middleware('cekstatus:admin')->name('add_prodi');
+Route::post('/admin/regis_prodi', [AdminController::class, 'store_prodi'])->middleware('cekstatus:admin')->name('store_prodi');
 Route::get('/admin/edit_prodi', [AdminController::class, 'edit_prodi'])->middleware('cekstatus:admin');
 Route::post('/admin/store_upd_prodi', [AdminController::class, 'store_upd_prodi'])->middleware('cekstatus:admin')->name('update_prodi');
 Route::post('/admin/delete_prodi', [AdminController::class, 'delete_prodi'])->middleware('cekstatus:admin');
+
+Route::get('/admin/manajemen_kaprodi', [AdminController::class, 'manajemen_kaprodi'])->middleware('cekstatus:admin');
+Route::get('/admin/add_kaprodi', [AdminController::class, 'add_kaprodi'])->middleware('cekstatus:admin');
+Route::post('/admin/regis_kaprodi', [AdminController::class, 'store_kaprodi'])->middleware('cekstatus:admin')->name('add_kaprodi');
+Route::get('/admin/edit_kaprodi', [AdminController::class, 'edit_kaprodi'])->middleware('cekstatus:admin');
+Route::post('/admin/store_upd_kaprodi', [AdminController::class, 'store_upd_kaprodi'])->middleware('cekstatus:admin')->name('update_kaprodi');
+Route::post('/admin/delete_kaprodi', [AdminController::class, 'delete_kaprodi'])->middleware('cekstatus:admin');
+
+Route::get('/admin/manajemen_sekretaris_prodi', [AdminController::class, 'manajemen_sekretaris_prodi'])->middleware('cekstatus:admin');
+Route::get('/admin/add_sekretaris_prodi', [AdminController::class, 'add_sekretaris_prodi'])->middleware('cekstatus:admin');
+Route::post('/admin/regis_sekretaris_prodi', [AdminController::class, 'store_sekretaris_prodi'])->middleware('cekstatus:admin')->name('add_sekretaris_prodi');
+Route::get('/admin/edit_sekretaris_prodi', [AdminController::class, 'edit_sekretaris_prodi'])->middleware('cekstatus:admin');
+Route::post('/admin/store_upd_sekretaris_prodi', [AdminController::class, 'store_upd_sekretaris_prodi'])->middleware('cekstatus:admin')->name('update_sekretaris_prodi');
+Route::post('/admin/delete_sekretaris_prodi', [AdminController::class, 'delete_sekretaris_prodi'])->middleware('cekstatus:admin');
 
 Route::get('/admin/manajemen_dosen', [AdminController::class, 'manajemen_dosen'])->middleware('cekstatus:admin');
 Route::get('/admin/add_dosen', [AdminController::class, 'add_dosen'])->middleware('cekstatus:admin');
@@ -71,6 +87,13 @@ Route::post('/admin/regis_dosen', [AdminController::class, 'store_dosen'])->midd
 Route::get('/admin/edit_dosen', [AdminController::class, 'edit_dosen'])->middleware('cekstatus:admin');
 Route::post('/admin/store_upd_dosen', [AdminController::class, 'store_upd_dosen'])->middleware('cekstatus:admin')->name('update_dosen');
 Route::post('/admin/delete_dosen', [AdminController::class, 'delete_dosen'])->middleware('cekstatus:admin');
+
+Route::get('/admin/manajemen_kepala_lab', [AdminController::class, 'manajemen_kepala_lab'])->middleware('cekstatus:admin');
+Route::get('/admin/add_kepala_lab', [AdminController::class, 'add_kepala_lab'])->middleware('cekstatus:admin');
+Route::post('/admin/regis_kepala_lab', [AdminController::class, 'store_kepala_lab'])->middleware('cekstatus:admin')->name('add_kepala_lab');
+Route::get('/admin/edit_kepala_lab', [AdminController::class, 'edit_kepala_lab'])->middleware('cekstatus:admin');
+Route::post('/admin/store_upd_kepala_lab', [AdminController::class, 'store_upd_kepala_lab'])->middleware('cekstatus:admin')->name('update_kepala_lab');
+Route::post('/admin/delete_kepala_lab', [AdminController::class, 'delete_kepala_lab'])->middleware('cekstatus:admin');
 
 Route::get('/admin/manajemen_mhs', [AdminController::class, 'manajemen_mhs'])->middleware('cekstatus:admin');
 Route::get('/admin/add_mhs', [AdminController::class, 'add_mhs'])->middleware('cekstatus:admin');
@@ -236,61 +259,81 @@ Route::get('admin/tes', [AdminController::class, 'tes'])->middleware('cekstatus:
 
 
 // ROUTES FOR DOSEN
-Route::get('/dosen/dashboard', [DosenController::class, 'index'])->middleware('cekstatus:dosen');
-Route::get('/dosen/mhs_bimbingan', [DosenController::class, 'mhs_bimbingan'])->middleware('cekstatus:dosen')->name('mhs_bimbingan');
-Route::get('/dosen/mahasiswaTA/', [DosenController::class, 'mahasiswaBimbingan'])->middleware('cekstatus:dosen')->name('mahasiswa_ta');
-Route::get('/dosen/mahasiswaBimbingan', [DosenController::class, 'mahasiswaTA'])->middleware('cekstatus:dosen')->name('mhs_aktif');
-Route::get('/dosen/mahasiswaLulus', [DosenController::class, 'mahasiswaLulus'])->middleware('cekstatus:dosen')->name('lulus');
+Route::get('/dosen/dashboard', [DosenController::class, 'index'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/mhs_bimbingan', [DosenController::class, 'mhs_bimbingan'])->middleware('cekstatus:dosen_pembimbing')->name('mhs_bimbingan');
+Route::get('/dosen/mahasiswaTA/', [DosenController::class, 'mahasiswaBimbingan'])->middleware('cekstatus:dosen_pembimbing')->name('mahasiswa_ta');
+Route::get('/dosen/mahasiswaBimbingan', [DosenController::class, 'mahasiswaTA'])->middleware('cekstatus:dosen_pembimbing')->name('mhs_aktif');
+Route::get('/dosen/mahasiswaLulus', [DosenController::class, 'mahasiswaLulus'])->middleware('cekstatus:dosen_pembimbing')->name('lulus');
 // bimbingan
-Route::get('/dosen/bimbingan_sempro', [DosenController::class, 'bimbingan_sempro'])->middleware('cekstatus:dosen')->name('bimbingan_sempro');
-Route::post('/dosen/simpan_bimbingan_sempro', [DosenController::class, 'simpan_bimbingan_sempro'])->middleware('cekstatus:dosen')->name('simpan_bimbingan_sempro');
-Route::get('/dosen/bimbingan_semhas', [DosenController::class, 'bimbingan_semhas'])->middleware('cekstatus:dosen')->name('bimbingan_semhas');
-Route::post('/dosen/simpan_bimbingan_semhas', [DosenController::class, 'simpan_bimbingan_semhas'])->middleware('cekstatus:dosen')->name('simpan_bimbingan_semhas');
-Route::get('/dosen/bimbingan_sidang', [DosenController::class, 'bimbingan_sidang'])->middleware('cekstatus:dosen')->name('bimbingan_sidang');
-Route::post('/dosen/simpan_bimbingan_sidang', [DosenController::class, 'simpan_bimbingan_sidang'])->middleware('cekstatus:dosen')->name('simpan_bimbingan_sidang');
-Route::get('/dosen/detailMahasiswaBimbingan/{nim}', [DosenController::class, 'detailMahasiswa'])->middleware('cekstatus:dosen');
-Route::get('/dosen/mahasiswaUji', [DosenController::class, 'mahasiswaUji'])->middleware('cekstatus:dosen');
-Route::get('/dosen/pascaMeHij', [DosenController::class, 'pascaMeHij'])->middleware('cekstatus:dosen');
-Route::get('/dosen/praMehij', [DosenController::class, 'praMeHij'])->middleware('cekstatus:dosen');
-Route::get('/dosen/pascaMeHij1', [DosenController::class, 'pascaMeHij1'])->middleware('cekstatus:dosen');
-Route::get('/dosen/praMehij1', [DosenController::class, 'praMeHij1'])->middleware('cekstatus:dosen');
-Route::get('/dosen/progresSkripsi', [DosenController::class, 'progresSkripsi'])->middleware('cekstatus:dosen');
-Route::get('/dosen/sempro', [DosenController::class, 'sempro'])->middleware('cekstatus:dosen');
-Route::get('/dosen/semhas', [DosenController::class, 'semhas'])->middleware('cekstatus:dosen');
-Route::get('/dosen/sempro1', [DosenController::class, 'sempro1'])->middleware('cekstatus:dosen');
-Route::get('/dosen/semhas1', [DosenController::class, 'semhas1'])->middleware('cekstatus:dosen');
-Route::get('/dosen/jadwalSeminarSidang', [DosenController::class, 'jadwalSeminarSidang'])->middleware('cekstatus:dosen');
-Route::get('/dosen/sidang', [DosenController::class, 'mejaHijau'])->middleware('cekstatus:dosen');
-Route::get('/dosen/sidMejaHijau1', [DosenController::class, 'sidMejaHijau1'])->middleware('cekstatus:dosen');
-Route::get('/dosen/mejaHijau1', [DosenController::class, 'mejaHijau1'])->middleware('cekstatus:dosen');
-Route::get('/dosen/tampilMahasiswa/{nim}', [DosenController::class, 'berkasBeritaAcara'])->middleware('cekstatus:dosen');
-Route::get('/dosen/tampilMahasiswa2/{nim}', [DosenController::class, 'berkasPenilaianSempro'])->middleware('cekstatus:dosen');
-Route::get('/dosen/berkasSemhas1/{nim}', [DosenController::class, 'berkasPersetujuanSemhas'])->middleware('cekstatus:dosen');
-Route::get('/dosen/berkasSemhas2/{nim}', [DosenController::class, 'berkasBeritaAcaraSemhas'])->middleware('cekstatus:dosen');
-Route::get('/dosen/berkasSemhas3/{nim}', [DosenController::class, 'berkasPersetujuanSidang'])->middleware('cekstatus:dosen');
-Route::get('/dosen/berkasSemhas4/{nim}', [DosenController::class, 'berkasKataPengantarSidang'])->middleware('cekstatus:dosen');
-Route::get('/dosen/berkasSemhas5/{nim}', [DosenController::class, 'berkasBeritaAcaraSidang'])->middleware('cekstatus:dosen');
-Route::get('/dosen/lembar_kendali/{nim}', [DosenController::class, 'lembar_kendali'])->middleware('cekstatus:dosen');
-Route::get('/dosen/lembar_kendali_sempro/{nim}', [DosenController::class, 'lembar_kendali_sempro'])->middleware('cekstatus:dosen');
-Route::get('/dosen/lembar_kendali_semhas/{nim}', [DosenController::class, 'lembar_kendali_semhas'])->middleware('cekstatus:dosen');
-Route::get('/dosen/lembar_kendali_sidang/{nim}', [DosenController::class, 'lembar_kendali_sidang'])->middleware('cekstatus:dosen');
+Route::get('/dosen/bimbingan_sempro', [DosenController::class, 'bimbingan_sempro'])->middleware('cekstatus:dosen_pembimbing')->name('bimbingan_sempro');
+Route::post('/dosen/simpan_bimbingan_sempro', [DosenController::class, 'simpan_bimbingan_sempro'])->middleware('cekstatus:dosen_pembimbing')->name('simpan_bimbingan_sempro');
+Route::get('/dosen/bimbingan_semhas', [DosenController::class, 'bimbingan_semhas'])->middleware('cekstatus:dosen_pembimbing')->name('bimbingan_semhas');
+Route::post('/dosen/simpan_bimbingan_semhas', [DosenController::class, 'simpan_bimbingan_semhas'])->middleware('cekstatus:dosen_pembimbing')->name('simpan_bimbingan_semhas');
+Route::get('/dosen/bimbingan_sidang', [DosenController::class, 'bimbingan_sidang'])->middleware('cekstatus:dosen_pembimbing')->name('bimbingan_sidang');
+Route::post('/dosen/simpan_bimbingan_sidang', [DosenController::class, 'simpan_bimbingan_sidang'])->middleware('cekstatus:dosen_pembimbing')->name('simpan_bimbingan_sidang');
+Route::get('/dosen/detailMahasiswaBimbingan/{nim}', [DosenController::class, 'detailMahasiswa'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/mahasiswaUji', [DosenController::class, 'mahasiswaUji'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/pascaMeHij', [DosenController::class, 'pascaMeHij'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/praMehij', [DosenController::class, 'praMeHij'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/pascaMeHij1', [DosenController::class, 'pascaMeHij1'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/praMehij1', [DosenController::class, 'praMeHij1'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/progresSkripsi', [DosenController::class, 'progresSkripsi'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/sempro', [DosenController::class, 'sempro'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/semhas', [DosenController::class, 'semhas'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/sempro1', [DosenController::class, 'sempro1'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/semhas1', [DosenController::class, 'semhas1'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/jadwalSeminarSidang', [DosenController::class, 'jadwalSeminarSidang'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/sidang', [DosenController::class, 'mejaHijau'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/sidMejaHijau1', [DosenController::class, 'sidMejaHijau1'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/mejaHijau1', [DosenController::class, 'mejaHijau1'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/tampilMahasiswa/{nim}', [DosenController::class, 'berkasBeritaAcara'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/tampilMahasiswa2/{nim}', [DosenController::class, 'berkasPenilaianSempro'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/berkasSemhas1/{nim}', [DosenController::class, 'berkasPersetujuanSemhas'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/berkasSemhas2/{nim}', [DosenController::class, 'berkasBeritaAcaraSemhas'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/berkasSemhas3/{nim}', [DosenController::class, 'berkasPersetujuanSidang'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/berkasSemhas4/{nim}', [DosenController::class, 'berkasKataPengantarSidang'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/berkasSemhas5/{nim}', [DosenController::class, 'berkasBeritaAcaraSidang'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/lembar_kendali/{nim}', [DosenController::class, 'lembar_kendali'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/lembar_kendali_sempro/{nim}', [DosenController::class, 'lembar_kendali_sempro'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/lembar_kendali_semhas/{nim}', [DosenController::class, 'lembar_kendali_semhas'])->middleware('cekstatus:dosen_pembimbing');
+Route::get('/dosen/lembar_kendali_sidang/{nim}', [DosenController::class, 'lembar_kendali_sidang'])->middleware('cekstatus:dosen_pembimbing');
 
-Route::get('/dosen/search', [DosenController::class, 'search_mhs_lulus'])->middleware('cekstatus:dosen')->name('search_mhs');
-Route::get('/dosen/search_aktif', [DosenController::class, 'search_mhs_aktif'])->middleware('cekstatus:dosen')->name('search_mhs_aktif');
-Route::get('/dosen/filter', [DosenController::class, 'filter'])->middleware('cekstatus:dosen')->name('filter');
+Route::get('/dosen/search', [DosenController::class, 'search_mhs_lulus'])->middleware('cekstatus:dosen_pembimbing')->name('search_mhs');
+Route::get('/dosen/search_aktif', [DosenController::class, 'search_mhs_aktif'])->middleware('cekstatus:dosen_pembimbing')->name('search_mhs_aktif');
+Route::get('/dosen/filter', [DosenController::class, 'filter'])->middleware('cekstatus:dosen_pembimbing')->name('filter');
 
 // view dosbing input nilai
-Route::get('/dosen/v_nilai_uji_program', [DosenController::class, 'v_nilai_uji_program'])->middleware('cekstatus:dosen')->name('v_nilai_uji_program');
-Route::get('/dosen/v_nilai_semhas', [DosenController::class, 'v_nilai_semhas'])->middleware('cekstatus:dosen')->name('v_nilai_semhas');
-Route::get('/dosen/v_nilai_sidang', [DosenController::class, 'v_nilai_sidang'])->middleware('cekstatus:dosen')->name('v_nilai_sidang');
+Route::get('/dosen/v_nilai_uji_program', [DosenController::class, 'v_nilai_uji_program'])->middleware('cekstatus:dosen_pembimbing')->name('v_nilai_uji_program');
+Route::get('/dosen/v_nilai_semhas', [DosenController::class, 'v_nilai_semhas'])->middleware('cekstatus:dosen_pembimbing')->name('v_nilai_semhas');
+Route::get('/dosen/v_nilai_sidang', [DosenController::class, 'v_nilai_sidang'])->middleware('cekstatus:dosen_pembimbing')->name('v_nilai_sidang');
 
 // store dosbing input nilai
-Route::post('/dosen/store_nilai_uji_program', [DosenController::class, 'store_nilai_uji_program'])->middleware('cekstatus:dosen')->name('store_nilai_uji_program');
-Route::post('/dosen/store_nilai_semhas', [DosenController::class, 'store_nilai_semhas'])->middleware('cekstatus:dosen')->name('store_nilai_semhas');
-Route::post('/dosen/store_nilai_sidang', [DosenController::class, 'store_nilai_sidang'])->middleware('cekstatus:dosen')->name('store_nilai_sidang');
+Route::post('/dosen/store_nilai_uji_program', [DosenController::class, 'store_nilai_uji_program'])->middleware('cekstatus:dosen_pembimbing')->name('store_nilai_uji_program');
+Route::post('/dosen/store_nilai_semhas', [DosenController::class, 'store_nilai_semhas'])->middleware('cekstatus:dosen_pembimbing')->name('store_nilai_semhas_dosen');
+Route::post('/dosen/store_nilai_sidang_dosen', [DosenController::class, 'store_nilai_sidang_dosen'])->middleware('cekstatus:dosen_pembimbing')->name('store_nilai_sidang_dosen');
+
+// DOSEN PENGUJI
+Route::get('/penguji/dashboard', [DosenController::class, 'penguji'])->middleware('cekstatus:dosen_penguji')->name('penguji');
+Route::get('/penguji/daftar_mahasiswa_penguji', [DosenController::class, 'daftar_mahasiswa_penguji'])->middleware('cekstatus:dosen_penguji')->name('daftar_mahasiswa_penguji');
+Route::get('/dosen_penguji/detail_mahasiswa_penguji/{nim}', [DosenController::class, 'detail_mahasiswa_penguji'])->middleware('cekstatus:dosen_penguji')->name('detail_mahasiswa_penguji');
+// jadwal
+Route::get('/penguji/jadwal_kelayakan_isi_proposal', [DosenController::class, 'jadwal_kelayakan_isi_proposal'])->middleware('cekstatus:dosen_penguji')->name('jadwal_kelayakan_isi_proposal');
+Route::get('/penguji/jadwal_semhas_penguji', [DosenController::class, 'jadwal_semhas_penguji'])->middleware('cekstatus:dosen_penguji')->name('jadwal_semhas_penguji');
+Route::get('/penguji/jadwal_sidang_penguji', [DosenController::class, 'jadwal_sidang_penguji'])->middleware('cekstatus:dosen_penguji')->name('jadwal_sidang_penguji');
+// input nilai
+Route::get('/penguji/penguji_nilai_uji_kelayakan', [DosenController::class, 'penguji_nilai_uji_kelayakan'])->middleware('cekstatus:dosen_penguji')->name('penguji_nilai_uji_kelayakan');
+Route::get('/penguji/penguji_nilai_semhas', [DosenController::class, 'penguji_nilai_semhas'])->middleware('cekstatus:dosen_penguji')->name('penguji_nilai_semhas');
+Route::get('/penguji/penguji_nilai_sidang', [DosenController::class, 'penguji_nilai_sidang'])->middleware('cekstatus:dosen_penguji')->name('penguji_nilai_sidang');
+// store nilai
+Route::post('/penguji/store_nilai_uji_kelayakan_penguji', [DosenController::class, 'store_nilai_uji_kelayakan_penguji'])->middleware('cekstatus:dosen_penguji')->name('store_nilai_uji_kelayakan_penguji');
+Route::post('/penguji/store_nilai_semhas_penguji', [DosenController::class, 'store_nilai_semhas_penguji'])->middleware('cekstatus:dosen_penguji')->name('store_nilai_semhas_penguji');
+Route::post('/penguji/store_nilai_sidang_penguji', [DosenController::class, 'store_nilai_sidang_penguji'])->middleware('cekstatus:dosen_penguji')->name('store_nilai_sidang_penguji');
 
 
 // END ROUTES FOR DOSEN
+
+// kepala laboratorium
+Route::get('/penguji/dashboard', [DosenController::class, 'penguji'])->middleware('cekstatus:dosen_penguji')->name('penguji');
 
 
 // ROUTES FOR KAPRODI
@@ -359,5 +402,192 @@ Route::post('/prodi/store_nilai_sidang', [KaprodiController::class, 'store_nilai
 Route::get('/prodi/edit_nilai_sidang', [KaprodiController::class, 'edit_nilai_sidang'])->middleware('cekstatus:prodi')->name('edit_nilai_sidang');
 Route::post('/prodi/store_upd_nilai_sidang', [KaprodiController::class, 'store_upd_nilai_sidang'])->middleware('cekstatus:prodi')->name('store_upd_nilai_sidang');
 Route::post('/prodi/delete_nilai_sidang', [KaprodiController::class, 'delete_nilai_sidang'])->middleware('cekstatus:prodi')->name('delete_nilai_sidang');
+//end routes for penilaian
+// END ROUTES FOR KAPRODI
+
+// START ROUTES FOR KEPALA LABORATORIUM
+Route::get('/kepala_laboratorium/dashboard', [DosenController::class, 'kepala_laboratorium'])->middleware('cekstatus:kepala_laboratorium')->name('kepala_laboratorium');
+Route::get('/kepala_laboratorium/kepala_lab_exum', [DosenController::class, 'kepala_lab_exum'])->middleware('cekstatus:kepala_laboratorium')->name('kepala_lab_exum');
+Route::get('/kepala_laboratorium/kepala_lab_exum_download/{nim}', [DosenController::class, 'kepala_lab_exum_download'])->middleware('cekstatus:kepala_laboratorium')->name('kepala_lab_exum_download');
+Route::get('/kepala_laboratorium/kepala_lab_exum_setujui/{nim}', [DosenController::class, 'kepala_lab_exum_setujui'])->middleware('cekstatus:kepala_laboratorium')->name('kepala_lab_exum_setujui');
+Route::get('/kepala_laboratorium/kepala_lab_exum_tolak/{nim}', [DosenController::class, 'kepala_lab_exum_tolak'])->middleware('cekstatus:kepala_laboratorium')->name('kepala_lab_exum_tolak');
+Route::get('/kepala_laboratorium/daftar_exum_diterima', [DosenController::class, 'daftar_exum_diterima'])->middleware('cekstatus:kepala_laboratorium')->name('daftar_exum_diterima');
+Route::get('/kepala_laboratorium/daftar_exum_ditolak', [DosenController::class, 'daftar_exum_ditolak'])->middleware('cekstatus:kepala_laboratorium')->name('daftar_exum_ditolak');
+
+// END ROUTES FOR KEPALA LABORATORIUM
+
+// START ROUTES FOR PEGAWAI PRODI
+Route::get('/pegawai_prodi/dashboard', [DosenController::class, 'pegawai_prodi'])->middleware('cekstatus:pegawai_prodi')->name('pegawai_prodi');
+Route::get('/pegawai_prodi/uji_kelayakan_penjadwalan', [DosenController::class, 'uji_kelayakan_penjadwalan'])->middleware('cekstatus:pegawai_prodi')->name('uji_kelayakan_penjadwalan');
+Route::get('/pegawai_prodi/sempro_penjadwalan', [DosenController::class, 'sempro_penjadwalan'])->middleware('cekstatus:pegawai_prodi')->name('sempro_penjadwalan');
+Route::get('/pegawai_prodi/semhas_penjadwalan', [DosenController::class, 'semhas_penjadwalan'])->middleware('cekstatus:pegawai_prodi')->name('semhas_penjadwalan');
+Route::get('/pegawai_prodi/sidang_penjadwalan', [DosenController::class, 'sidang_penjadwalan'])->middleware('cekstatus:pegawai_prodi')->name('sidang_penjadwalan');
+Route::post('/pegawai_prodi/cetakJadwalSempro_pegawai', [DosenController::class, 'cetakJadwalSempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('cetakJadwalSempro_pegawai');
+Route::post('/pegawai_prodi/cetakUndanganSempro_pegawai', [DosenController::class, 'cetakUndanganSempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('cetakUndanganSempro_pegawai');
+Route::get('/pegawai_prodi/add_jd_sempro_pegawai', [DosenController::class, 'add_jd_sempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('add_jd_sempro_pegawai');
+Route::post('/pegawai_prodi/edit_jd_sempro_pegawai', [DosenController::class, 'edit_jd_sempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('edit_jd_sempro_pegawai');
+Route::post('/pegawai_prodi/delete_jd_sempro_pegawai', [DosenController::class, 'delete_jd_sempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('delete_jd_sempro_pegawai');
+Route::post('/pegawai_prodi/store_new_jd_sempro_pegawai', [DosenController::class, 'store_new_jd_sempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('store_new_jd_sempro_pegawai');
+Route::post('/pegawai_prodi/store_jd_sempro_pegawai', [DosenController::class, 'store_jd_sempro_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('store_jd_sempro_pegawai');
+Route::get('/pegawai_prodi/add_jd_semhas_pegawai', [DosenController::class, 'add_jd_semhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('add_jd_semhas_pegawai');
+Route::post('/pegawai_prodi/edit_jd_semhas_pegawai', [DosenController::class, 'edit_jd_semhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('edit_jd_semhas_pegawai');
+Route::post('/pegawai_prodi/delete_jd_semhas_pegawai', [DosenController::class, 'delete_jd_semhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('delete_jd_semhas_pegawai');
+Route::post('/pegawai_prodi/store_new_jd_semhas_pegawai', [DosenController::class, 'store_new_jd_semhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('store_new_jd_semhas_pegawai');
+Route::post('/pegawai_prodi/store_jd_semhas_pegawai', [DosenController::class, 'store_jd_semhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('store_jd_semhas_pegawai');
+Route::post('/pegawai_prodi/cetakJadwalSemhas_pegawai', [DosenController::class, 'cetakJadwalSemhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('cetakJadwalSemhas_pegawai');
+Route::post('/pegawai_prodi/cetakUndanganSemhas_pegawai', [DosenController::class, 'cetakUndanganSemhas_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('cetakUndanganSemhas_pegawai');
+
+Route::post('/pegawai_prodi/cetakJadwalSidang_pegawai', [DosenController::class, 'cetakJadwalSidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('cetakJadwalSidang_pegawai');
+Route::post('/pegawai_prodi/cetakUndanganSidang_pegawai', [DosenController::class, 'cetakUndanganSidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('cetakUndanganSidang_pegawai');
+Route::get('/pegawai_prodi/add_jd_sidang_pegawai', [DosenController::class, 'add_jd_sidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('add_jd_sidang_pegawai');
+Route::post('/pegawai_prodi/edit_jd_sidang_pegawai', [DosenController::class, 'edit_jd_sidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('edit_jd_sidang_pegawai');
+Route::post('/pegawai_prodi/delete_jd_sidang_pegawai', [DosenController::class, 'delete_jd_sidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('delete_jd_sidang_pegawai');
+Route::post('/pegawai_prodi/store_new_jd_sidang_pegawai', [DosenController::class, 'store_new_jd_sidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('store_new_jd_sidang_pegawai');
+Route::post('/pegawai_prodi/store_jd_sidang_pegawai', [DosenController::class, 'store_jd_sidang_pegawai'])->middleware('cekstatus:pegawai_prodi')->name('store_jd_sidang_pegawai');
+
+
+// END ROUTES FOR DOSEN
+
+// kepala laboratorium
+Route::get('/penguji/dashboard', [DosenController::class, 'penguji'])->middleware('cekstatus:dosen_penguji')->name('penguji');
+
+
+// ROUTES FOR Sekretaris Prodi
+Route::get('/sekretaris_prodi/dashboard', [SekretarisProdiController::class, 'index'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/menu_mahasiswa', [SekretarisProdiController::class, 'menu_mahasiswa'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/menu_mahasiswa/mahasiswa_aktif', [SekretarisProdiController::class, 'mahasiswa_aktif'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/menu_mahasiswa/mahasiswa_aktif/search', [SekretarisProdiController::class, 'cari_mahasiswa'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/menu_mahasiswa/mahasiswa_alumni', [SekretarisProdiController::class, 'mahasiswa_alumni'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/menu_mahasiswa/mahasiswa_alumni/search', [SekretarisProdiController::class, 'cari_alumni'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/hasil_filter', [SekretarisProdiController::class, 'filter'])->middleware('cekstatus:sekretaris_prodi')->name('filter_mhs_prodi_sekre');
+Route::get('/sekretaris_prodi/hasil_filter_progress_skripsi', [SekretarisProdiController::class, 'filter2'])->middleware('cekstatus:sekretaris_prodi')->name('filter_mhs2_prodi');
+
+// Route::get('/kaprodi/mahasiswa/{nim}',[KaprodiController::class, 'tampil'])->middleware('cekstatus:kaprodi');
+Route::get('/sekretaris_prodi/beritaacara', [SekretarisProdiController::class, 'berita_acara'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/beritaacara/sempro', [SekretarisProdiController::class, 'berita_acaraSempro'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/beritaacara/sempro/{nim}', [SekretarisProdiController::class, 'berita_acara_sempro'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/beritaacara/semhas', [SekretarisProdiController::class, 'berita_acaraSemhas'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/beritaacara/semhas/{nim}', [SekretarisProdiController::class, 'berita_acara_semhas'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/beritaacara/mejahijau', [SekretarisProdiController::class, 'berita_acaraMejahijau'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/beritaacara/mejahijau/{nim}', [SekretarisProdiController::class, 'berita_acara_mejahijau'])->middleware('cekstatus:sekretaris_prodi');
+
+Route::get('/sekretaris_prodi/undangan_daftar_peserta', [SekretarisProdiController::class, 'undangan_daftar_peserta'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/seminar_proposal', [SekretarisProdiController::class, 'daftar_sempro'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/undangan_seminar_proposal/{tanggal}', [SekretarisProdiController::class, 'undangan_sempro'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/peserta_seminar_proposal/{tanggal}', [SekretarisProdiController::class, 'peserta_sempro'])->middleware('cekstatus:sekretaris_prodi');
+
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/seminar_hasil', [SekretarisProdiController::class, 'daftar_semhas'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/undangan_seminar_hasil/{tanggal}', [SekretarisProdiController::class, 'undangan_semhas'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/peserta_seminar_hasil/{tanggal}', [SekretarisProdiController::class, 'peserta_semhas'])->middleware('cekstatus:sekretaris_prodi');
+
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/sidang_meja_hijau', [SekretarisProdiController::class, 'daftar_sidang'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/undangan_sidang_meja_hijau/{tanggal}', [SekretarisProdiController::class, 'undangan_sidang'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/undangan_daftar_peserta/peserta_sidang_meja_hijau/{tanggal}', [SekretarisProdiController::class, 'peserta_sidang'])->middleware('cekstatus:sekretaris_prodi');
+
+Route::get('/sekretaris_prodi/lembar_kendali/{nim}', [SekretarisProdiController::class, 'lembar_kendali'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/lembar_kendali_sempro/{nim}', [SekretarisProdiController::class, 'lembar_kendali_sempro'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/lembar_kendali_semhas/{nim}', [SekretarisProdiController::class, 'lembar_kendali_semhas'])->middleware('cekstatus:sekretaris_prodi');
+Route::get('/sekretaris_prodi/lembar_kendali_sidang/{nim}', [SekretarisProdiController::class, 'lembar_kendali_sidang'])->middleware('cekstatus:sekretaris_prodi');
+
+//routes for penilaian
+Route::get('/prodi/input_nilai', [KaprodiController::class, 'input_nilai'])->middleware('cekstatus:prodi')->name('input_nilai');
+Route::get('/prodi/daftar_nilai_uji_program', [KaprodiController::class, 'daftar_nilai_uji_program'])->middleware('cekstatus:prodi')->name('nilai_uji_program');
+Route::get('/prodi/add_nilai_uji_program', [KaprodiController::class, 'add_nilai_uji_program'])->middleware('cekstatus:prodi')->name('add_nilai_uji_program');
+Route::post('/prodi/store_nilai_uji_program', [KaprodiController::class, 'store_nilai_program'])->middleware('cekstatus:prodi')->name('store_nilai_program');
+Route::get('/prodi/edit_nilai_uji_program', [KaprodiController::class, 'edit_nilai_uji_program'])->middleware('cekstatus:prodi')->name('edit_nilai_uji_program');
+Route::post('/prodi/store_upd_nilai_uji_program', [KaprodiController::class, 'store_upd_nilai_uji_program'])->middleware('cekstatus:prodi')->name('store_upd_nilai_program');
+Route::post('/prodi/delete_nilai_uji_program', [KaprodiController::class, 'delete_nilai_uji_program'])->middleware('cekstatus:prodi')->name('delete_nilai_uji_program');
+
+Route::get('/prodi/daftar_nilai_IPK', [KaprodiController::class, 'daftar_nilai_IPK'])->middleware('cekstatus:prodi')->name('nilai_IPK');
+Route::get('/prodi/add_nilai_IPK', [KaprodiController::class, 'add_nilai_IPK'])->middleware('cekstatus:prodi')->name('add_nilai_IPK');
+Route::post('/prodi/store_nilai_IPK', [KaprodiController::class, 'store_nilai_IPK'])->middleware('cekstatus:prodi')->name('store_nilai_IPK');
+Route::get('/prodi/edit_nilai_IPK', [KaprodiController::class, 'edit_nilai_IPK'])->middleware('cekstatus:prodi')->name('edit_nilai_IPK');
+Route::post('/prodi/store_upd_nilai_IPK', [KaprodiController::class, 'store_upd_nilai_IPK'])->middleware('cekstatus:prodi')->name('store_upd_nilai_IPK');
+Route::post('/prodi/delete_nilai_IPK', [KaprodiController::class, 'delete_nilai_IPK'])->middleware('cekstatus:prodi')->name('delete_nilai_IPK');
+
+Route::get('/prodi/daftar_nilai_semhas', [KaprodiController::class, 'daftar_nilai_semhas'])->middleware('cekstatus:prodi')->name('nilai_semhas');
+Route::get('/prodi/add_nilai_semhas', [KaprodiController::class, 'add_nilai_semhas'])->middleware('cekstatus:prodi')->name('add_nilai_semhas');
+Route::post('/prodi/store_nilai_semhas', [KaprodiController::class, 'store_nilai_semhas'])->middleware('cekstatus:prodi')->name('store_nilai_semhas');
+Route::get('/prodi/edit_nilai_semhas', [KaprodiController::class, 'edit_nilai_semhas'])->middleware('cekstatus:prodi')->name('edit_nilai_semhas');
+Route::post('/prodi/store_upd_nilai_semhas', [KaprodiController::class, 'store_upd_nilai_semhas'])->middleware('cekstatus:prodi')->name('store_upd_nilai_semhas');
+Route::post('/prodi/delete_nilai_semhas', [KaprodiController::class, 'delete_nilai_semhas'])->middleware('cekstatus:prodi')->name('delete_nilai_semhas');
+
+Route::get('/prodi/daftar_nilai_sidang', [KaprodiController::class, 'daftar_nilai_sidang_meja_hijau'])->middleware('cekstatus:prodi')->name('nilai_sidang');
+Route::get('/prodi/add_nilai_sidang', [KaprodiController::class, 'add_nilai_sidang'])->middleware('cekstatus:prodi')->name('add_nilai_sidang');
+Route::post('/prodi/store_nilai_sidang', [KaprodiController::class, 'store_nilai_sidang'])->middleware('cekstatus:prodi')->name('store_nilai_sidang');
+Route::get('/prodi/edit_nilai_sidang', [KaprodiController::class, 'edit_nilai_sidang'])->middleware('cekstatus:prodi')->name('edit_nilai_sidang');
+Route::post('/prodi/store_upd_nilai_sidang', [KaprodiController::class, 'store_upd_nilai_sidang'])->middleware('cekstatus:prodi')->name('store_upd_nilai_sidang');
+Route::post('/prodi/delete_nilai_sidang', [KaprodiController::class, 'delete_nilai_sidang'])->middleware('cekstatus:prodi')->name('delete_nilai_sidang');
+//end routes for penilaian
+// END Sekretaris prodi
+
+// Kaprodi
+// ROUTES FOR Kepala Prodi
+Route::get('/kepala_prodi/dashboard', [KepalaProdiController::class, 'index'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/menu_mahasiswa', [KepalaProdiController::class, 'menu_mahasiswa'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/menu_mahasiswa/mahasiswa_aktif', [KepalaProdiController::class, 'mahasiswa_aktif'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/menu_mahasiswa/mahasiswa_aktif/search', [KepalaProdiController::class, 'cari_mahasiswa'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/menu_mahasiswa/mahasiswa_alumni', [KepalaProdiController::class, 'mahasiswa_alumni'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/menu_mahasiswa/mahasiswa_alumni/search', [KepalaProdiController::class, 'cari_alumni'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/hasil_filter', [KepalaProdiController::class, 'filter'])->middleware('cekstatus:kepala_prodi')->name('filter_mhs_prodi');
+Route::get('/kepala_prodi/hasil_filter_progress_skripsi', [KepalaProdiController::class, 'filter2'])->middleware('cekstatus:kepala_prodi')->name('filter_mhs2_prodi');
+
+// Route::get('/kaprodi/mahasiswa/{nim}',[KaprodiController::class, 'tampil'])->middleware('cekstatus:kaprodi');
+Route::get('/kepala_prodi/beritaacara', [KepalaProdiController::class, 'berita_acara'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/beritaacara/sempro', [KepalaProdiController::class, 'berita_acaraSempro'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/beritaacara/sempro/{nim}', [KepalaProdiController::class, 'berita_acara_sempro'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/beritaacara/semhas', [KepalaProdiController::class, 'berita_acaraSemhas'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/beritaacara/semhas/{nim}', [KepalaProdiController::class, 'berita_acara_semhas'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/beritaacara/mejahijau', [KepalaProdiController::class, 'berita_acaraMejahijau'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/beritaacara/mejahijau/{nim}', [KepalaProdiController::class, 'berita_acara_mejahijau'])->middleware('cekstatus:kepala_prodi');
+
+Route::get('/kepala_prodi/undangan_daftar_peserta', [KepalaProdiController::class, 'undangan_daftar_peserta'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/seminar_proposal', [KepalaProdiController::class, 'daftar_sempro'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/undangan_seminar_proposal/{tanggal}', [KepalaProdiController::class, 'undangan_sempro'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/peserta_seminar_proposal/{tanggal}', [KepalaProdiController::class, 'peserta_sempro'])->middleware('cekstatus:kepala_prodi');
+
+Route::get('/kepala_prodi/undangan_daftar_peserta/seminar_hasil', [KepalaProdiController::class, 'daftar_semhas'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/undangan_seminar_hasil/{tanggal}', [KepalaProdiController::class, 'undangan_semhas'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/peserta_seminar_hasil/{tanggal}', [KepalaProdiController::class, 'peserta_semhas'])->middleware('cekstatus:kepala_prodi');
+
+Route::get('/kepala_prodi/undangan_daftar_peserta/sidang_meja_hijau', [KepalaProdiController::class, 'daftar_sidang'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/undangan_sidang_meja_hijau/{tanggal}', [KepalaProdiController::class, 'undangan_sidang'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/undangan_daftar_peserta/peserta_sidang_meja_hijau/{tanggal}', [KepalaProdiController::class, 'peserta_sidang'])->middleware('cekstatus:kepala_prodi');
+
+Route::get('/kepala_prodi/lembar_kendali/{nim}', [KepalaProdiController::class, 'lembar_kendali'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/lembar_kendali_sempro/{nim}', [KepalaProdiController::class, 'lembar_kendali_sempro'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/lembar_kendali_semhas/{nim}', [KepalaProdiController::class, 'lembar_kendali_semhas'])->middleware('cekstatus:kepala_prodi');
+Route::get('/kepala_prodi/lembar_kendali_sidang/{nim}', [KepalaProdiController::class, 'lembar_kendali_sidang'])->middleware('cekstatus:kepala_prodi');
+
+//routes for penilaian
+Route::get('/kepala_prodi/input_nilai', [KepalaProdiController::class, 'input_nilai'])->middleware('cekstatus:kepala_prodi')->name('input_nilai_kaprodi');
+Route::get('/kepala_prodi/daftar_nilai_uji_program', [KepalaProdiController::class, 'daftar_nilai_uji_program'])->middleware('cekstatus:kepala_prodi')->name('nilai_uji_program_kaprodi');
+// Route::get('/kepala_prodi/daftar_nilai_uji_program', [KepalaProdiController::class, 'daftar_nilai_uji_program'])->middleware('cekstatus:kepala_prodi')->name('nilai_uji_program_kaprodi');
+Route::get('/kepala_prodi/add_nilai_uji_program', [KepalaProdiController::class, 'add_nilai_uji_program'])->middleware('cekstatus:kepala_prodi')->name('add_nilai_uji_program_kaprodi');
+Route::post('/kepala_prodi/store_nilai_uji_program', [KepalaProdiController::class, 'store_nilai_program'])->middleware('cekstatus:kepala_prodi')->name('store_nilai_program_kaprodi');
+Route::get('/kepala_prodi/edit_nilai_uji_program', [KepalaProdiController::class, 'edit_nilai_uji_program'])->middleware('cekstatus:kepala_prodi')->name('edit_nilai_uji_program_kaprodi');
+Route::post('/kepala_prodi/store_upd_nilai_uji_program', [KepalaProdiController::class, 'store_upd_nilai_uji_program'])->middleware('cekstatus:kepala_prodi')->name('store_upd_nilai_uji_program_kaprodi');
+Route::post('/kepala_prodi/delete_nilai_uji_program', [KepalaProdiController::class, 'delete_nilai_uji_program'])->middleware('cekstatus:kepala_prodi')->name('delete_nilai_uji_program_kaprodi');
+
+Route::get('/kepala_prodi/daftar_nilai_IPK', [KepalaProdiController::class, 'daftar_nilai_IPK'])->middleware('cekstatus:kepala_prodi')->name('nilai_IPK');
+Route::get('/kepala_prodi/add_nilai_IPK', [KepalaProdiController::class, 'add_nilai_IPK'])->middleware('cekstatus:kepala_prodi')->name('add_nilai_IPK');
+Route::post('/kepala_prodi/store_nilai_IPK', [KepalaProdiController::class, 'store_nilai_IPK'])->middleware('cekstatus:kepala_prodi')->name('store_nilai_IPK');
+Route::get('/kepala_prodi/edit_nilai_IPK', [KepalaProdiController::class, 'edit_nilai_IPK'])->middleware('cekstatus:kepala_prodi')->name('edit_nilai_IPK');
+Route::post('/kepala_prodi/store_upd_nilai_IPK', [KepalaProdiController::class, 'store_upd_nilai_IPK'])->middleware('cekstatus:kepala_prodi')->name('store_upd_nilai_IPK');
+Route::post('/kepala_prodi/delete_nilai_IPK', [KepalaProdiController::class, 'delete_nilai_IPK'])->middleware('cekstatus:kepala_prodi')->name('delete_nilai_IPK');
+
+Route::get('/kepala_prodi/daftar_nilai_semhas', [KepalaProdiController::class, 'daftar_nilai_semhas'])->middleware('cekstatus:kepala_prodi')->name('nilai_semhas_kaprodi');
+Route::get('/kepala_prodi/add_nilai_semhas', [KepalaProdiController::class, 'add_nilai_semhas'])->middleware('cekstatus:kepala_prodi')->name('add_nilai_semhas_kaprodi');
+Route::post('/kepala_prodi/store_nilai_semhas', [KepalaProdiController::class, 'store_nilai_semhas'])->middleware('cekstatus:kepala_prodi')->name('store_nilai_semhas_kaprodi');
+Route::get('/kepala_prodi/edit_nilai_semhas', [KepalaProdiController::class, 'edit_nilai_semhas'])->middleware('cekstatus:kepala_prodi')->name('edit_nilai_semhas_kaprodi');
+Route::post('/kepala_prodi/store_upd_nilai_semhas', [KepalaProdiController::class, 'store_upd_nilai_semhas'])->middleware('cekstatus:kepala_prodi')->name('store_upd_nilai_semhas_kaprodi');
+Route::post('/kepala_prodi/delete_nilai_semhas', [KepalaProdiController::class, 'delete_nilai_semhas'])->middleware('cekstatus:kepala_prodi')->name('delete_nilai_semhas_kaprodi');
+
+Route::get('/kepala_prodi/daftar_nilai_sidang', [KepalaProdiController::class, 'daftar_nilai_sidang_meja_hijau'])->middleware('cekstatus:kepala_prodi')->name('nilai_sidang_kaprodi');
+Route::get('/kepala_prodi/add_nilai_sidang', [KepalaProdiController::class, 'add_nilai_sidang'])->middleware('cekstatus:kepala_prodi')->name('add_nilai_sidang_kaprodi');
+Route::post('/kepala_prodi/store_nilai_sidang', [KepalaProdiController::class, 'store_nilai_sidang'])->middleware('cekstatus:kepala_prodi')->name('store_nilai_sidang_kaprodi');
+Route::get('/kepala_prodi/edit_nilai_sidang', [KepalaProdiController::class, 'edit_nilai_sidang'])->middleware('cekstatus:kepala_prodi')->name('edit_nilai_sidang_kaprodi');
+Route::post('/kepala_prodi/store_upd_nilai_sidang', [KepalaProdiController::class, 'store_upd_nilai_sidang'])->middleware('cekstatus:kepala_prodi')->name('store_upd_nilai_sidang_kaprodi');
+Route::post('/kepala_prodi/delete_nilai_sidang', [KepalaProdiController::class, 'delete_nilai_sidang'])->middleware('cekstatus:kepala_prodi')->name('delete_nilai_sidang_kaprodi');
 //end routes for penilaian
 // END ROUTES FOR KAPRODI

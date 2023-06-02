@@ -1812,6 +1812,12 @@ DROP TABLE IF EXISTS `v_mahasiswa_aktif`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_mahasiswa_aktif`  AS SELECT `m`.`nama` AS `nama`, `m`.`nim` AS `nim`, `u`.`email` AS `email`, `m`.`angkatan` AS `angkatan`, `m`.`jenis_kelamin` AS `jenis_kelamin` FROM (`mahasiswas` `m` join `users` `u` on(`m`.`id_user` = `u`.`id`)) WHERE `m`.`status` = 'Aktif\'Aktif\'Aktif\'Aktif\'Aktif\'Aktif\'Aktif\'Aktif' ;
 
+
+-- create view jadwal_uji_kelayakan as select nim, nama, tanggal, waktu, tempat, judul_skripsi from jadwal_uji_kelayakans 
+-- join mahasiswas join skrisis
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_jadwal_uji_kelayakan`  AS SELECT `nim`, `nama`, `tanggal`, `waktu`, `tempat`, `judul_skripsi` FROM `jadwal_uji_kelayakans` join `mahasiswas`, `skrisis` ;
+
 -- --------------------------------------------------------
 
 --
@@ -2241,3 +2247,9 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
+
+
+

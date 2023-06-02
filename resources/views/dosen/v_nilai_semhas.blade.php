@@ -1,7 +1,7 @@
 @extends('dosen/layout')
 
 @section('title')
-    <title>Dosen - Dashboard</title>
+    <title>Dosen - Input Nilai Seminar Proposal</title>
 @endsection
 
 @section('sidebar')
@@ -51,15 +51,15 @@
             </li>
         </ul>
     </li>
-    <li class="sidebar-item has-sub">
+    <li class="sidebar-item has-sub active">
         <a href="#" class='sidebar-link active'>
             <span>Input Nilai</span>
         </a>
         <ul class="submenu">
-            <li class="submenu-item active">
+            <li class="submenu-item ">
                 <a href="{{ route('v_nilai_uji_program') }}">Input Nilai Uji Program</a>
             </li>
-            <li class="submenu-item ">
+            <li class="submenu-item active">
                 <a href="{{ route('v_nilai_semhas') }}">Input Nilai Seminar Hasil</a>
             </li>
             <li class="submenu-item ">
@@ -105,8 +105,25 @@
                 <div class="card card-outline-secondary">
                     <div class="row align-items-center m-5">
                         <div class="col-md mb-5">
+                            {{-- alert success_nilai_semhas --}}
+                            @if (session('success_nilai_semhas'))
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <strong>{{ session('success_nilai_semhas') }}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                            @endif
+                            {{-- alert error_nilai_semhas --}}
+                            @if (session('error_nilai_semhas'))
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>{{ session('error_nilai_semhas') }}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                            @endif
                             <!-- FORM PENDATAAN NILAI -->
-                            <form class="form form-horizontal" action="{{ route('store_nilai_semhas') }}" method="POST">
+                            <form class="form form-horizontal" action="{{ route('store_nilai_semhas_dosen') }}"
+                                method="POST">
                                 @csrf
                                 {{-- <input type="hidden" name="nim" value="{{ $data->nim }}"> --}}
                                 <div class="form-body">
@@ -117,13 +134,25 @@
                                             <label>Nama Mahasiswa</label>
                                         </div>
                                         <div class="col-md-8 form-group">
-                                            <select class="form-control" name="nama_mhs" id="nama_mhs" required>
-                                                <option value="">Pilih Mahasiswa</option>
-                                                @foreach ($data as $mhs)
+                                            <select class="form-select" name="nim" id="nim" required>
+                                                <option value="" selected disabled>Pilih Mahasiswa</option>
+                                                @foreach ($mahasiswa as $mhs)
                                                     <option value="{{ $mhs->nim }}">{{ $mhs->nama }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
+                                        {{-- <div class="col-md-4">
+                                            <label>Nama Mahasiswa</label>
+                                        </div>
+                                        <div class="col-md-8 form-group">
+                                            <select class="form-control" name="nim" id="nama_mhs" required>
+                                                <option value="0">Pilih Mahasiswa</option>
+                                                @foreach ($data as $mhs)
+                                                    <option value="{{ $mhs->nim }}">{{ $mhs->nim }}</option>
+                                                    <input type="hidden" name="nim_mhs" value="{{ $mhas->nim }}">
+                                                @endforeach
+                                            </select>
+                                        </div> --}}
                                         {{-- <div class="col-md-4">
                                             <label>NIM</label>
                                         </div>

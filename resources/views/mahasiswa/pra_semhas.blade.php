@@ -85,23 +85,32 @@
                             <p> Formulir ini merupakan riwayat bimbingan yang dilakukan mahasiswa dengan dosen pembimbing
                                 sebelum melakukan seminar hasil. Pastikan data yang diisikan merupakan data yang sebenarnya
                                 sesuai dengan hasil bimbingan dengan dosen pembimbing </p>
-                            @if ($mhs->no_statusAkses > 2)
+                            @if ($mhs->no_statusAkses > 2 && $bimbingan_check > 0)
                                 <div class="d-grid gap-2 d-md-flex justify-content">
                                     <a href="{{ '/mahasiswa/lembar_kendali_semhas' }}" target="blank"
                                         class="btn btn-success btn-sm">
                                         <i class="bi bi-printer-fill"></i> Cetak</a>
                                 </div>
                             @else
+                                {{-- pemberitahuan dosen pembimbing belum mengisi lembar kendali --}}
+                                <div class="alert alert-info alert-dismissible show fade">
+                                    <div class="alert-body">
+                                        <i>Pemberitahuan!</i> Dosen pembimbing belum mengisi lembar kendali bimbingan
+                                        seminar
+                                        hasil.
+                                    </div>
+                                </div>
                                 <div class="d-grid gap-2 d-md-flex justify-content">
                                     <a href="#" target="blank" class="btn btn-success disabled btn-sm">
                                         <i class="bi bi-printer-fill"></i> Cetak</a>
                                 </div>
                             @endif
 
-                            <hr><br>
+                            <hr>
 
                             <h5>2. Jadwal Seminar Hasil</h5>
-                            <p> Jadwal seminar hasil akan ditentukan oleh Pegawai Program Studi apabila berkas yang diajukan
+                            <p> Jadwal seminar hasil akan ditentukan oleh Pegawai Program Studi apabila berkas yang
+                                diajukan
                                 untuk melakukan seminar hasil telah lengkap. </p>
 
                             @if ($mhs->no_statusAkses > 3)

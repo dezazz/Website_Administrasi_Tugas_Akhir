@@ -21,29 +21,26 @@ class LoginController extends Controller
       case 'mahasiswa':
         return '/mahasiswa/dashboard';
         break;
-      case 'dosen':
+      case 'dosen_pembimbing':
         return '/dosen/dashboard';
         break;
       case 'prodi':
         return '/prodi/dashboard';
         break;
-      case 'kepala laboratorium':
-        return '/kepala-laboratorium/dashboard';
+      case 'dosen_penguji':
+        return '/penguji/dashboard';
         break;
-      case 'kepala prodi':
-        return '/kepala-prodi/dashboard';
+      case 'kepala_laboratorium':
+        return '/kepala_laboratorium/dashboard';
         break;
-      case 'sekretaris prodi':
-        return '/sekretaris-prodi/dashboard';
+      case 'pegawai_prodi':
+        return '/pegawai_prodi/dashboard';
         break;
-      case 'pegawai prodi':
-        return '/pegawai-prodi/dashboard';
+      case 'sekretaris_prodi':
+        return '/sekretaris_prodi/dashboard';
         break;
-      case 'dosen pembimbing':
-        return '/dosen-pembimbing/dashboard';
-        break;
-      case 'dosen penguji':
-        return '/dosen-penguji/dashboard';
+      case 'kepala_prodi':
+        return '/kepala_prodi/dashboard';
         break;
 
       default:

@@ -1,3 +1,7 @@
+<?php
+use Carbon\Carbon;
+$now = Carbon::now();
+?>
 <!DOCTYPE html>
 <html>
 
@@ -301,7 +305,7 @@
                         <table width="625">
                             <tr>
                                 <td width="360"></td>
-                                <td width="100">Medan, ......................................</td>
+                                <td width="100">Medan, {{ Carbon::parse($now)->translatedFormat('d F Y') }}</td>
                             </tr>
                             <tr>
                                 <td width="360"></td>

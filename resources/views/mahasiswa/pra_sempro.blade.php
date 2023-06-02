@@ -89,6 +89,7 @@
                         </div>
                     @endif
                     <div class="card">
+
                         <div class="card-body">
                             <h5>1. Formulir Calon Pembimbing</h5>
                             <p class="text-right"> Formulir ini berisikan pengajuan calon pembimbing yang akan ditentukan
@@ -102,35 +103,45 @@
                                         aria-label="Close"></button>
                                 </div>
                             @endif
-
-                            <form action="{{ route('ajukan_bidang_ilmu') }}" method="GET">
-                                @csrf
-                                <input name="id" type="hidden" value="{{ Auth::user()->id }}">
-                                <label for="bidang_ilmu1">Bidang Ilmu 1</label>
-                                {{-- input bidang ilmu 1 --}}
-                                <select name="bidang_ilmu1" id="bidang_ilmu1" class="form-select">
-                                    <option value="0">Pilih bidang ilmu</option>
-                                    @foreach ($bidang_ilmu as $bidang)
-                                        <option value="{{ $bidang->id }}">{{ $bidang->bidang_ilmu }}</option>
-                                    @endforeach
-                                </select>
-                                <br>
-                                <label for="bidang_ilmu2">Bidang Ilmu 2</label>
-                                <select name="bidang_ilmu2" id="bidang_ilmu2" class="form-select">
-                                    <option value="0">Pilih bidang ilmu</option>
-                                    @foreach ($bidang_ilmu as $bidang)
-                                        <option value="{{ $bidang->id }}">{{ $bidang->bidang_ilmu }}</option>
-                                    @endforeach
-                                </select>
-                                <br>
-                                {{-- submit --}}
-                                <button type="submit" class="btn btn-primary btn-sm"><i
-                                        class="bi bi-envelope"></i>&nbsp;&nbsp;Daftar</button>
-                            </form>
-                            <div class="d-grid gap-2 d-md-flex justify-content">
-                                <a href="/mahasiswa/calon_pembimbing/{{ Auth::user()->id }}" target="blank"
-                                    class="btn btn-primary btn-sm"><i class="bi bi-printer-fill"></i> Unduh </a>
-                            </div>
+                            @if ($pengajuan_bidang_ilmu == 0)
+                                <form action="{{ route('ajukan_bidang_ilmu') }}" method="GET">
+                                    @csrf
+                                    <input name="id" type="hidden" value="{{ Auth::user()->id }}">
+                                    <label for="bidang_ilmu1">Bidang Ilmu 1</label>
+                                    {{-- input bidang ilmu 1 --}}
+                                    <select name="bidang_ilmu1" id="bidang_ilmu1" class="form-select">
+                                        <option value="0">Pilih bidang ilmu</option>
+                                        @foreach ($bidang_ilmu as $bidang)
+                                            <option value="{{ $bidang->id }}">{{ $bidang->bidang_ilmu }}</option>
+                                        @endforeach
+                                    </select>
+                                    <br>
+                                    <label for="bidang_ilmu2">Bidang Ilmu 2</label>
+                                    <select name="bidang_ilmu2" id="bidang_ilmu2" class="form-select">
+                                        <option value="0">Pilih bidang ilmu</option>
+                                        @foreach ($bidang_ilmu as $bidang)
+                                            <option value="{{ $bidang->id }}">{{ $bidang->bidang_ilmu }}</option>
+                                        @endforeach
+                                    </select>
+                                    <br>
+                                    {{-- submit --}}
+                                    <button type="submit" class="btn btn-primary btn-sm"><i
+                                            class="bi bi-envelope"></i>&nbsp;&nbsp;Daftar</button>
+                                </form>
+                            @elseif ($pengajuan_bidang_ilmu == 1)
+                                {{-- pemberitahuan telah mengajukan calon pembimbing --}}
+                                <div class="form-group">
+                                    <div class="alert alert-info alert-dismissible show fade">
+                                        <i class="bi bi-info-circle"></i> Anda telah mengajukan calon pembimbing dan sedang
+                                        dalam proses verifikasi. Silahkan tunggu konfirmasi dalam penentuan dosen
+                                        pembimbing. Terima kasih.
+                                    </div>
+                                    <div class="d-grid gap-2 d-md-flex justify-content">
+                                        <a href="/mahasiswa/calon_pembimbing/{{ Auth::user()->id }}" target="blank"
+                                            class="btn btn-primary btn-sm"><i class="bi bi-printer-fill"></i> Unduh </a>
+                                    </div>
+                                </div>
+                            @endif
                             <hr>
                         </div>
 
@@ -158,7 +169,7 @@
                             <h6>Form Jurnal</h6>
                             <p> Berikut contoh jurnal yang dapat digunakan sebagai panduan. Silahkan unduh melalui
                                 tombol unduh dibawah ini. </p>
-                            @if ($mhs->no_statusAkses > 6)
+                            @if ($pengajuan_bidang_ilmu == 1)
                                 <div class="d-grid gap-2 d-md-flex justify-content">
                                     <a href="/mahasiswa/format_jurnal" class="btn btn-primary btn-sm" target="blank">
                                         <i class="bi bi-download"></i> Unduh Jurnal
@@ -173,9 +184,11 @@
                             @endif
                             <br>
                             {{-- input file exum --}}
-                            @if ($exum_checker != 1)
+                            @if ($exum_checker > 1)
                                 <div class="alert alert-success alert-dismissible show fade">
                                     <i class="bi bi-check-circle"></i> Anda telah mengajukan executive summary
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
                                 </div>
                             @elseif ($exum_checker == 0)
                                 <form action="{{ route('ajukan_exum') }}" method="POST" enctype="multipart/form-data">
@@ -190,33 +203,57 @@
                                     <button type="submit" class="btn btn-primary btn-sm"><i
                                             class="bi bi-envelope"></i>&nbsp;&nbsp;Daftar</button>
                                 </form>
+                            @elseif ($exum->status == 'Ditolak')
+                                {{-- pemberitahuan untuk mengajukan exum lagi karena exum ditolak --}}
+                                <div class="alert alert-danger alert-dismissible show fade">
+                                    <i class="bi bi-x-circle"></i> Executive summary anda ditolak. Silahkan ajukan kembali
+                                    executive summary anda. Terima kasih. <button class="btn-close"
+                                        data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                <form action="{{ route('ajukan_exum') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input name="id" type="hidden" value="{{ Auth::user()->id }}">
+                                    <div class="mb-3">
+                                        <label for="exum" class="form-label">File Executive Summary</label>
+                                        <input class="form-control" type="file" id="exum" name="exum">
+                                    </div>
+                                    <br>
+                                    {{-- submit --}}
+                                    <button type="submit" class="btn btn-primary btn-sm"><i
+                                            class="bi bi-envelope"></i>&nbsp;&nbsp;Daftar</button>
+                                </form>
                             @endif
-
                             {{-- Status Exum --}}
                             <h5>Status Executive Summary</h5>
-                            <p
-                                class="text-right
+                            {{-- pemberitahuan telah mengajukan exum --}}
+
+                            @if ($exum)
+                                <p
+                                    class="text-right
                                             @if ($exum->status == 'Diterima') text-success
                                             @elseif($exum->status == 'Ditolak')
                                                 text-danger
                                             @else
                                                 text-warning @endif
                                             ">
-                                {{ $exum->status }}
-                            </p>
-                            {{-- Unduh file exum --}}
-                            <div
-                                class="d-grid gap
+                                    {{ $exum->status }}
+                                </p>
+                                {{-- Unduh file exum --}}
+                                <div
+                                    class="d-grid gap
                                             @if ($exum->status == 'Diterima') gap-2
                                             @elseif($exum->status == 'Ditolak')
                                                 gap-2
                                             @else
                                                 gap-2 @endif
                                             d-md-flex justify-content">
-                                <a href="/mahasiswa/download_exum" target="blank" class="btn btn-primary btn-sm"><i
-                                        class="bi bi-download"></i> Unduh Exum
-                                </a>
-                            </div>
+                                    <a href="/mahasiswa/download_exum" target="blank" class="btn btn-primary btn-sm"><i
+                                            class="bi bi-download"></i> Unduh Exum
+                                    </a>
+                                </div>
+                            @else
+                                <p class="text-right text-warning">Belum ada status</p>
+                            @endif
                             {{-- <div class="d-grid gap-2 d-md-flex justify-content">
                                 <a href="/mahasiswa/calon_pembimbing/{{ Auth::user()->id }}" target="blank"
                                     class="btn btn-primary btn-sm"><i class="bi bi-printer-fill"></i> Unduh </a>
@@ -230,33 +267,82 @@
                             <p> Form ini merupakan form pengajuan judul yang akan diajukan oleh mahasiswa untuk dilakukan
                                 uji kelayakan judul.</p>
                             {{-- alert pemberitahuan --}}
+                            @if ($exum->status == 'Disetujui')
+                                <form action="{{ route('daftar_judul') }}" method="GET">
+                                    @csrf
+                                    <input name="id" type="hidden" value="{{ Auth::user()->id }}">
+                                    {{-- check box --}}
+                                    {{-- @if ($judul_checker > 1)
+                                    <div class="alert alert-success alert-dismissible show fade">
+                                        <i class="bi bi-check-circle"></i> Anda telah mengajukan judul
+                                    </div> --}}
+                                    @if ($pengajuan_judul_checker == 0)
+                                        <div class="alert alert-success alert-dismissible show fade">
+                                            <i class="bi bi-exclamation-circle"></i> Anda dapat mengajukan judul karena
+                                            exum telah disetujui oleh kepala labolatorium
+                                        </div>
+                                        <p class="text-left mb-1">Judul diajukan oleh: </p>
+                                        <div class="mt-1 mb-3">
+                                            {{-- select pilih dosen mahasiswa pengaju --}}
+                                            <select class="form-select" aria-label="Default select example"
+                                                name="pengaju">
+                                                <option value="-">Pilih Pengaju</option>
+                                                <option value="mahasiswa">Mahasiswa</option>
+                                                <option value="dosen">Dosen</option>
+                                            </select>
 
-                            <form action="{{ route('daftar_judul') }}" method="GET">
-                                @csrf
-                                <input name="id" type="hidden" value="{{ Auth::user()->id }}">
-                                {{-- check box --}}
-                                <p class="text-left mb-1">Judul diajukan oleh: </p>
-                                <div class="mt-1 mb-3">
-                                    <input type="checkbox" id="dosen" name="dosen" required>
-                                    <label for="dosen">Dosen</label> <br>
-                                    <input type="checkbox" id="dosen" name="dosen" required>
-                                    <label for="dosen">Mahasiswa</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="judul" class="form-label">Judul</label>
+                                            <input type="text" class="form-control" id="judul" name="judul"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="latar_belakang" class="form-label">Latar Belakang</label>
+                                            <textarea class="form-control" id="latar_belakang" name="latar_belakang" rows="3" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="penelitian_terdahulu" class="form-label">Penelitian
+                                                Terdahulu</label>
+                                            <textarea class="form-control" id="penelitian_terdahulu" name="penelitian_terdahulu" rows="3" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="rumusan_masalah" class="form-label">Rumusan Masalah</label>
+                                            <textarea class="form-control" id="rumusan_masalah" name="rumusan_masalah" rows="3" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="metodologi" class="form-label">Metodologi</label>
+                                            <textarea class="form-control" id="metodologi" name="metodologi" rows="3" required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="referensi" class="form-label">Referensi</label>
+                                            <textarea class="form-control" id="referensi" name="referensi" rows="3" required></textarea>
+                                        </div>
+                                        <div class="d-grid gap-2 d-md-flex justify-content mt-3">
+                                            <button type="submit" class="btn btn-primary btn-sm"><i
+                                                    class="bi bi-envelope"></i>&nbsp;&nbsp;Ajukan Judul</button>
+                                        </div>
+
+
+
+                                        <div class="row">
+                                            <div class="col-md-4"></div>
+                                        </div>
+                                    @elseif ($pengajuan_judul_checker == 1)
+                                        <div class="alert alert-success alert-dismissible show fade">
+                                            <i class="bi bi-exclamation-circle"></i> Anda telah mengajukan judul
+                                        </div>
+                                    @endif
+                                </form>
+                            @else
+                                {{-- info bahwa pengajuan judul setelah exum diterima --}}
+                                <div class="alert alert-warning alert-dismissible show fade">
+                                    <i class="bi bi-exclamation-circle"></i> Pengajuan judul hanya dapat dilakukan setelah
+                                    Exum diterima
                                 </div>
-                                {{-- radio uji kelayakan diterima atau ditolak --}}
-                                {{-- <p class="text-left mb-1 mt-2">Uji kelayakan: </p>
-                                <div class="mt-1">
-                                    <input type="radio" id="diterima" name="status" required>
-                                    <label for="diterima">Diterima</label> <br>
-                                    <input type="radio" id="ditolak" name="status" required>
-                                    <label for="ditolak">Ditolak</label>
-                                </div> --}}
-
-                                {{-- submit --}}
-                                <button type="submit" class="btn btn-primary btn-sm"><i
-                                        class="bi bi-envelope"></i>&nbsp;&nbsp;Daftar</button>
-                            </form>
-                            @if ($mhs->no_statusAkses > 0)
-                                <div class="d-grid gap-2 d-md-flex justify-content">
+                            @endif
+                            @if ($pengajuan_judul_checker > 0)
+                                <div class="d-grid gap-2 d-md-flex justify-content mt-5">
                                     <a href="{{ '/mahasiswa/pengajuan_judul_skripsi' }}" target="blank"
                                         class="btn btn-primary btn-sm">
                                         <i class="bi bi-printer-fill"></i> Cetak</a>
@@ -283,37 +369,33 @@
                                 </div>
                             @endif
 
-                            @if ($mhs->no_statusAkses > 0 && $skripsi_checker == 0)
-                                <div class="d-grid gap-2 d-md-flex justify-content">
-                                    <a href="{{ route('pendaftaran_judul') }}" target="blank"
-                                        class="btn btn-success btn-sm">
-                                        <i class="bi bi-plus-circle"></i> Daftarkan Judul
-                                    </a>
+                            @if ($mhs->no_statusAkses >= 0 && $skripsi_checker == 1)
+                                <div class="alert alert-success alert-dismissible show fade">
+                                    <i class="bi bi-check-circle"></i> Judul skripsi kamu sudah terdaftar di sistem
                                 </div>
-                            @elseif($mhs->no_statusAkses > 0)
-                                @if ($skripsi_checker > 0)
-                                    <div class="alert alert-success alert-dismissible show fade">
-                                        <i class="bi bi-check-circle"></i> Judul skripsi kamu sudah terdaftar di sistem
-                                    </div>
-                                    {{-- <p>Judul skripsi kamu sudah terdaftar di sistem.</p> --}}
-                                    <div class="d-grid gap-2 d-md-flex justify-content">
-                                        <form action="{{ route('perbaikan_judul') }}">
-                                            <input type="hidden" name="nim" value="{{ $mhs->nim }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="bi bi-pencil-square"></i> Edit Judul </button>
-                                        </form>
-                                    </div>
-                                @else
-                                    <div class="d-grid gap-2 d-md-flex justify-content">
-                                        <a href="#"><button class="btn btn-success btn-sm disabled">
-                                                <i class="bi bi-pencil-square"></i> Daftarkan Judul </button>
-                                        </a>
-                                    </div>
-                                @endif
+                                {{-- <p>Judul skripsi kamu sudah terdaftar di sistem.</p> --}}
+                                <div class="d-grid gap-2 d-md-flex justify-content">
+                                    <form action="/mahasiswa/edit_judul">
+                                        <input type="hidden" name="nim" value="{{ $mhs->nim }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="bi bi-pencil-square"></i> Edit Judul </button>
+                                    </form>
+                                </div>
+                            @else
+                                <div class="d-grid gap-2 d-md-flex justify-content">
+                                    <form action="/mahasiswa/edit_judul">
+                                        <input type="hidden" name="nim" value="{{ $mhs->nim }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm disabled">
+                                            <i class="bi bi-pencil-square"></i> Edit Judul </button>
+                                    </form>
+                                </div>
                             @endif
-                            <hr><br>
-
+                            <hr>
+                        </div>
+                        <div class="card-body">
+                            {{-- hanya dapat diakses jika sudah no_statusAkses = 2 --}}
                             <h5>5. Jadwal Seminar Proposal</h5>
                             <p> Jadwal seminar proposal akan ditentukan oleh Program Studi. Silahkan periksa jadwal seminar
                                 proposal
@@ -332,7 +414,7 @@
                                 </div>
                             @endif
 
-                            <hr><br>
+                            <hr>
                             <h5>6. Lembar Kendali Bimbingan Skripsi Seminar Proposal</h5>
                             <p> Formulir ini Anda butuhkan sebelum seminar proposal untuk menjadi lembar kendali skripsi.
                                 Data Anda terkait rencana judul skripsi, tanggal bimbingan serta catatan selama bimbingan
@@ -358,20 +440,6 @@
                     </div>
                 </div>
             </div>
-            <!-- end submenu 1 -->
-
-            <!-- submenu 2 -->
-            {{-- <div class="row">
-                <div class="col-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>02. Seminar Proposal</h4>
-                        </div>
-
-                    </div>
-                </div>
-            </div> --}}
-            <!-- end submenu 2 -->
         </div>
     </div>
 @endsection

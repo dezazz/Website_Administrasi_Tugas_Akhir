@@ -12,9 +12,12 @@ use App\Models\Mahasiswa;
 use App\Models\BidangIlmu;
 use App\Models\StatusAkses;
 use Illuminate\Http\Request;
+use App\Models\PengajuanJudul;
 use Illuminate\Support\Carbon;
+use Illuminate\Translation\Translator;
 use App\Models\AjukanBidangIlmu;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use App\Models\LogPengubahanSkripsi;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LogPendaftaranSkripsi;
@@ -40,20 +43,6 @@ class MahasiswaController extends Controller
 
         $percent = round((($status_akses->no_statusAkses / 7) * 100), 2);
         return view('mahasiswa/dashboard', compact('profile', 'status_akses', 'percent'));
-
-        //using function
-        // $profile   = DB::table('mahasiswas as m')
-        // ->leftJoin('skripsis as s', 'm.nim', '=', 's.nim')
-        // ->select('m.nim', 'm.nama', 'm.angkatan', 'm.foto', 'm.status', 's.judul_skripsi')
-        // ->where('id_user', Auth::user()->id)
-        // ->first();
-        // $status_akses = DB::table('status_akses as sa')
-        //             ->join('keterangan_status_akses as k','sa.no_statusAkses', '=', 'k.no_statusAkses')
-        //             ->select('sa.no_statusAkses','k.keterangan' )
-        //             ->where('nim', '=', $profile->nim)
-        //             ->first();
-        // $percent = DB::select("SELECT persentase_skripsi($status_akses->no_statusAkses)");
-        // $progress_percent = $percent[0];
     }
 
     // fungsi ke menu pra seminar proposal
@@ -66,12 +55,14 @@ class MahasiswaController extends Controller
             ->where('m.id_user', '=', Auth::user()->id)
             ->first();
         $skripsi_checker = Skripsi::where('nim', $mhs->nim)->count();
+        $pengajuan_judul_checker = PengajuanJudul::where('nim', $mhs->nim)->count();
         $exum_checker = Exum::where('nim', $mhs->nim)->count();
         $exum = "-";
+        $pengajuan_bidang_ilmu = AjukanBidangIlmu::where('id_user', Auth::user()->id)->count();
         if ($exum)
             $exum = Exum::where('nim', $mhs->nim)->first();
 
-        return view('mahasiswa.pra_sempro', compact('mhs', 'skripsi_checker', 'bidang_ilmu', 'exum', 'exum_checker'));
+        return view('mahasiswa.pra_sempro', compact('mhs', 'skripsi_checker', 'bidang_ilmu', 'exum', 'exum_checker', 'pengajuan_judul_checker', 'pengajuan_bidang_ilmu'));
     }
 
     // fungsi ke menu pra seminar hasil
@@ -79,10 +70,12 @@ class MahasiswaController extends Controller
     {
         $mhs = DB::table('mahasiswas')
             ->join('status_akses', 'status_akses.nim', '=', 'mahasiswas.nim')
-            ->select('status_akses.no_statusAkses')
+            ->select('status_akses.no_statusAkses', 'mahasiswas.nim')
             ->where('mahasiswas.id_user', '=', Auth::user()->id)
             ->first();
-        return view('mahasiswa.pra_semhas', compact('mhs'));
+
+        $bimbingan_check = DB::table('bimbingan_semhas')->where('nim', $mhs->nim)->count();
+        return view('mahasiswa.pra_semhas', compact('mhs', 'bimbingan_check'));
     }
 
     // fungsi ke menu pra sidang meja hijau
@@ -90,10 +83,11 @@ class MahasiswaController extends Controller
     {
         $mhs = DB::table('mahasiswas')
             ->join('status_akses', 'status_akses.nim', '=', 'mahasiswas.nim')
-            ->select('status_akses.no_statusAkses')
+            ->select('status_akses.no_statusAkses', 'mahasiswas.nim')
             ->where('mahasiswas.id_user', '=', Auth::user()->id)
             ->first();
-        return view('mahasiswa.pra_sidang', compact('mhs'));
+        $bimbingan_check = DB::table('bimbingan_sidang')->where('nim', $mhs->nim)->count();
+        return view('mahasiswa.pra_sidang', compact('mhs', 'bimbingan_check'));
     }
 
     public function pendaftaran_judul()
@@ -103,6 +97,50 @@ class MahasiswaController extends Controller
             ->first();
         $bidang_ilmu = BidangIlmu::all();
         return view('/mahasiswa/pendaftaran_judul', compact('mahasiswa', 'bidang_ilmu'));
+    }
+
+    public function daftar_judul(Request $request)
+    {
+        $mahasiswa = Mahasiswa::where('id_user', Auth::user()->id)
+            ->select('nim', 'nama')
+            ->first();
+        $bidang_ilmu = DB::table('bidang_ilmus as b')
+            ->join('ajukan_bidang_ilmus as ab', 'b.id', '=', 'ab.bidang_ilmu1')
+            ->select('b.bidang_ilmu')
+            ->where('id_user', Auth::user()->id)
+            ->first();
+        $judul = PengajuanJudul::where('nim', $mahasiswa->nim)->get();
+        // -- nama
+        // -- nim
+        // -- pengaju enum(dosen, mahasiswa)
+        // -- Judul / Topik Skripsi 	
+        // -- Latar Belakang dan Penelitian Terdahulu 	
+        // -- Rumusan Masalah 	
+        // -- Metodologi 	
+        // -- Referensi 
+        $daftar_judul = new PengajuanJudul;
+        $daftar_judul->nim = $mahasiswa->nim;
+        $daftar_judul->nama = $mahasiswa->nama;
+        $daftar_judul->pengaju = $request->pengaju;
+        $daftar_judul->judul_skripsi = $request->judul;
+        $daftar_judul->latar_belakang = $request->latar_belakang;
+        $daftar_judul->rumusan_masalah = $request->rumusan_masalah;
+        $daftar_judul->metodologi = $request->metodologi;
+        $daftar_judul->referensi = $request->referensi;
+        $daftar_judul->save();
+        // parse $request->judul from indonesia to english using Translator laravel
+        // $judul = Translator :: translate($request->judul, 'id', 'en');
+        // -- nim
+
+
+        $skripsi = new Skripsi;
+        $skripsi->nim = $mahasiswa->nim;
+        $skripsi->judul_skripsi = $request->judul;
+        $skripsi->eng_judul_skripsi = $request->judul;
+        $skripsi->bidang_ilmu = $bidang_ilmu->bidang_ilmu;
+        $skripsi->save();
+
+        return redirect('/mahasiswa/pra_sempro')->with('success', 'Judul berhasil didaftarkan');
     }
 
     public function store_judul(Request $request)
@@ -132,10 +170,11 @@ class MahasiswaController extends Controller
 
     public function store_new_judul(Request $request)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'new_judul_skripsi'  => 'required|min:20|max:255',
             'new_eng_judul_skripsi'  => 'required|min:20|max:255',
-            'bid_ilmu' => 'required|min:5|max:255',
+            // 'bid_ilmu' => 'required|min:5|max:255',
         ]);
 
         if ($request->new_judul_skripsi != $request->old_judul) {
@@ -152,26 +191,44 @@ class MahasiswaController extends Controller
                 $log->old_judul_skripsi = $request->old_judul;
                 $log->new_judul_skripsi = $request->new_judul_skripsi;
                 $log->old_bidang_ilmu   = $request->old_bidang_ilmu;
-                $log->new_bidang_ilmu   = $request->bid_ilmu;
+                $log->new_bidang_ilmu   = $request->old_bidang_ilmu;
                 $log->edited_by         = 'mahasiswa';
                 $log->save();
 
-
-                Skripsi::where('nim', $request->nim)->update([
-                    'judul_skripsi'         => $request->new_judul_skripsi,
-                    'eng_judul_skripsi'     => $request->new_eng_judul_skripsi,
-                    'bidang_ilmu'           => $request->bid_ilmu,
+                // CALL p_update_judul_skripsi('171402003', 'Analisa Perancangan Sistem Pendukung Keputusan Admisi Siswa Baru Menggunakan Analytical Hierarcy Pro', 'Analysis and Design of Decision Support System for Admission of New Students Using Analytical Hierarcy Pro', 'Sistem Informasi', @status);
+                // call procedure update judul skripsi
+                DB::select('call p_update_judul_skripsi(?, ?, ?, ?, @status)', [
+                    Auth::user()->mhs->nim,
+                    $request->new_judul_skripsi,
+                    $request->new_eng_judul_skripsi,
+                    $request->old_bidang_ilmu
                 ]);
+                // get status
+                $status = DB::select('select @status as status');
+                // dd($status);
+                // Skripsi::where('nim', $request->nim)->update([
+                //     'judul_skripsi'         => $request->new_judul_skripsi,
+                //     'eng_judul_skripsi'     => $request->new_eng_judul_skripsi,
+                //     'bidang_ilmu'           => $request->old_bidang_ilmu
+                // ]);
 
-                return redirect('/mahasiswa/pra_sempro')->with('success_edit_judul', 'Judul skripsi sudah diperbaharui!');
+                return redirect('/mahasiswa/pra_sempro')->with('success_edit_judul', 'Judul skripsi berhasil diubah!');
             }
         } else {
-            Skripsi::where('nim', $request->nim)->update([
-                'judul_skripsi'         => $request->new_judul_skripsi,
-                'eng_judul_skripsi'     => $request->new_eng_judul_skripsi,
-                'bidang_ilmu'           => $request->bid_ilmu,
+            DB::select('call p_update_judul_skripsi(?, ?, ?, ?, @status)', [
+                Auth::user()->mhs->nim,
+                $request->new_judul_skripsi,
+                $request->new_eng_judul_skripsi,
+                $request->old_bidang_ilmu
             ]);
-            return redirect('/mahasiswa/pra_sempro')->with('success_edit_judul', 'Judul skripsi sudah diperbaharui!');
+            // get status
+            $status = DB::select('select @status as status');
+            // Skripsi::where('nim', $request->nim)->update([
+            //     'judul_skripsi'         => $request->new_judul_skripsi,
+            //     'eng_judul_skripsi'     => $request->new_eng_judul_skripsi,
+            //     'bidang_ilmu'           => $request->bid_ilmu,
+            // ]);
+            return redirect('/mahasiswa/pra_sempro')->with('success_edit_judul', 'Judul skripsi berhasil diubah!');
         }
     }
 
@@ -219,13 +276,16 @@ class MahasiswaController extends Controller
             ->leftJoin('skripsis as s', 'm.nim', '=', 's.nim')
             ->leftJoin('v_dosbing as dp', 'm.nim', '=', 'dp.nim')
             ->join('jadwal_sempros as j', 'm.nim', '=', 'j.nim')
-            ->select('m.nim', 'm.nama', 'dp.nama_dosbing1', 'dp.nama_dosbing2', 's.judul_skripsi', 'j.tanggal_sempro')
+            ->select('m.nim', 'm.nama', 'dp.nip_dosbing1', 'dp.nama_dosbing1', 'dp.nama_dosbing2', 's.judul_skripsi', 'j.tanggal_sempro')
             ->where('m.id_user', '=', Auth::user()->id)
             ->first();
-
+        $bimbingan_sempro = DB::table('bimbingan_sempro')
+            ->where('nim', '=', $data->nim)
+            ->get();
+        // dd($bimbingan_sempro);
         $tanggal    = Carbon::parse($data->tanggal_sempro)->translatedFormat('l, d F Y');
 
-        return view('mahasiswa.lembar-kendali-proposal', compact('data', 'tanggal'));
+        return view('mahasiswa.lembar-kendali-proposal', compact('data', 'tanggal', 'bimbingan_sempro'));
 
         // UNTUK VERSI DOMPDF
         // $data1 = [
@@ -254,11 +314,14 @@ class MahasiswaController extends Controller
             ->join('v_dosbing as dp', 'm.nim', '=', 'dp.nim')
             ->join('skripsis as s', 'm.nim', '=', 's.nim')
             ->join('jadwal_semhas as j', 'm.nim', '=', 'j.nim')
-            ->select('m.nim', 'm.nama', 'dp.nama_dosbing1', 'dp.nama_dosbing2', 's.judul_skripsi', 'j.tanggal_semhas')
+            ->select('m.nim', 'm.nama', 'dp.nip_dosbing1', 'dp.nama_dosbing1', 'dp.nama_dosbing2', 's.judul_skripsi', 'j.tanggal_semhas')
             ->where('m.id_user', '=', Auth::user()->id)
             ->first();
+        $bimbingan_semhas = DB::table('bimbingan_semhas')
+            ->where('nim', '=', $data->nim)
+            ->get();
         $tanggal    = Carbon::parse($data->tanggal_semhas)->translatedFormat('l, d F Y');
-        return view('mahasiswa.lembar-kendali-semhas', compact('data', 'tanggal'));
+        return view('mahasiswa.lembar-kendali-semhas', compact('data', 'tanggal', 'bimbingan_semhas'));
     }
 
     // fungsi mengarahkan ke file pdf lembar kendali pra sidang meja hijau
@@ -268,20 +331,25 @@ class MahasiswaController extends Controller
             ->join('v_dosbing as dp', 'm.nim', '=', 'dp.nim')
             ->join('skripsis as s', 'm.nim', '=', 's.nim')
             ->join('jadwal_sidangs as j', 'm.nim', '=', 'j.nim')
-            ->select('m.nim', 'm.nama', 'dp.nama_dosbing1', 'dp.nama_dosbing2', 's.judul_skripsi', 'j.tanggal_sidang')
+            ->select('m.nim', 'm.nama', 'dp.nip_dosbing1', 'dp.nama_dosbing1', 'dp.nama_dosbing2', 's.judul_skripsi', 'j.tanggal_sidang')
             ->where('m.id_user', '=', Auth::user()->id)
             ->first();
-
+        $bimbingan_sidang = DB::table('bimbingan_sidang')
+            ->where('nim', '=', $data->nim)
+            ->get();
         $tanggal    = Carbon::parse($data->tanggal_sidang)->translatedFormat('l, d F Y');
-        return view('mahasiswa.lembar-kendali-sidang', compact('data', 'tanggal'));
+        return view('mahasiswa.lembar-kendali-sidang', compact('data', 'tanggal', 'bimbingan_sidang'));
     }
 
     // fungsi mengarahkan ke file pdf pengajuan judul skripsi
     public function pengajuan_judul_skripsi()
     {
         $data_mhs = DB::table('mahasiswas')->where('id_user', Auth::user()->id)
-            ->select('nama', 'nim')->first();
-        return view('mahasiswa/pengajuan-judul-skripsi', compact('data_mhs'));
+            ->select('nama', 'nim', 'foto')->first();
+        $pengajuan_judul = DB::table('pengajuan_judul')->where('nim', $data_mhs->nim)->first();
+        // dd($pengajuan_judul);
+        // $bidang_ilmu1 = DB::table('ajukan_bidang_ilmu')->join('')
+        return view('mahasiswa/pengajuan-judul-skripsi', compact('data_mhs', 'pengajuan_judul'));
     }
 
     // halaman tanggal sempro ATAU berita acara sempro
@@ -362,7 +430,11 @@ class MahasiswaController extends Controller
         $bidang_ilmu1 = BidangIlmu::where('id', $id_ilmu->bidang_ilmu1)->select('bidang_ilmu')->first();
         $bidang_ilmu2 = BidangIlmu::where('id', $id_ilmu->bidang_ilmu2)->select('bidang_ilmu')->first();
         // $bidang_ilmu1 = DB::table('bidang_ilmus')->where('id', 1)->first();
-        $ketua = Dosen::where('nip', '197908312009121002')->select('nip', 'nama')->first();
+        $ketua = User::where('status', 'kepala_prodi')
+            ->join('dosens', 'users.id', '=', 'dosens.id_user')
+            ->select('users.id', 'dosens.nama', 'dosens.nip')
+            ->first();
+
         $mhs = Mahasiswa::where('id_user', $id)->select('nim', 'nama')->first();
         $profile   = DB::table('mahasiswas as m')
             ->leftJoin('skripsis as s', 'm.nim', '=', 's.nim')

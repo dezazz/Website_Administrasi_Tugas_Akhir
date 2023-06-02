@@ -16,37 +16,35 @@ class RedirectIfAuthenticated
 
          switch ($role) {
             case 'admin':
-               return '/admin/dashboard';
+               return redirect('/admin/dashboard');
                break;
             case 'mahasiswa':
-               return '/mahasiswa/dashboard';
+               return redirect('/mahasiswa/dashboard');
                break;
-            case 'dosen':
-               return '/dosen/dashboard';
+            case 'dosen_pembimbing':
+               return redirect('/dosen/dashboard');
                break;
             case 'prodi':
-               return '/prodi/dashboard';
+               return redirect('/prodi/dashboard');
                break;
-            case 'kepala laboratorium':
-               return '/kepala-laboratorium/dashboard';
+            case 'dosen_penguji':
+               return redirect('/penguji/dashboard');
                break;
-            case 'kepala prodi':
-               return '/kepala-prodi/dashboard';
+            case 'kepala_laboratorium':
+               return redirect('/kepala_laboratorium/dashboard');
                break;
-            case 'sekretaris prodi':
-               return '/sekretaris-prodi/dashboard';
+            case 'pegawai_prodi':
+               return redirect('/pegawai_prodi/dashboard');
                break;
-            case 'pegawai prodi':
-               return '/pegawai-prodi/dashboard';
+            case 'sekretaris_prodi':
+               return redirect('/sekretaris_prodi/dashboard');
                break;
-            case 'dosen pembimbing':
-               return '/dosen-pembimbing/dashboard';
+            case 'kepala_prodi':
+               return redirect('/kepala_prodi/dashboard');
                break;
-            case 'dosen penguji':
-               return '/dosen-penguji/dashboard';
-               break;
+
             default:
-               return '/';
+               return redirect('/');
                break;
          }
       }

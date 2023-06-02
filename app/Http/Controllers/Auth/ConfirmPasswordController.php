@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\ConfirmsPasswords;
 
 class ConfirmPasswordController extends Controller
 {
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Confirm Password Controller
     |--------------------------------------------------------------------------
@@ -19,42 +20,46 @@ class ConfirmPasswordController extends Controller
     |
     */
 
-    use ConfirmsPasswords;
+  use ConfirmsPasswords;
 
-    /**
-     * Where to redirect users when the intended url fails.
-     *
-     * @var string
-     */
-    public function redirectTo() {
-        $role = Auth::user()->status; 
-        switch ($role) {
-          case 'admin':
-            return '/admin/dashboard';
-            break;
-          case 'mahasiswa':
-            return '/mahasiswa/dashboard';
-            break; 
-          case 'dosen':
-            return '/dosen/dashboard';
-            break; 
-          case 'kaprodi':
-            return '/kaprodi/dashboard';
-            break;
-      
-          default:
-            return '/'; 
-          break;
-        }
-      }
+  /**
+   * Where to redirect users when the intended url fails.
+   *
+   * @var string
+   */
+  public function redirectTo()
+  {
+    $role = Auth::user()->status;
+    switch ($role) {
+      case 'admin':
+        return '/admin/dashboard';
+        break;
+      case 'mahasiswa':
+        return '/mahasiswa/dashboard';
+        break;
+      case 'dosen_pembimbing':
+        return '/dosen/dashboard';
+        break;
+      case 'kaprodi':
+        return '/kaprodi/dashboard';
+        break;
+      case 'dosen_penguji':
+        return '/penguji/dashboard';
+        break;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
+      default:
+        return '/';
+        break;
     }
+  }
+
+  /**
+   * Create a new controller instance.
+   *
+   * @return void
+   */
+  public function __construct()
+  {
+    $this->middleware('auth');
+  }
 }

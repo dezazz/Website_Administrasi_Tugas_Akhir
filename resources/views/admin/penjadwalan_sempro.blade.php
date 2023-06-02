@@ -5,163 +5,7 @@
     <title>Admin - Penjadwalan Seminar Proposal</title>
 @endsection
 
-@section('sidebar')
-    <li class="sidebar-item">
-        <a href="/admin/dashboard" class='sidebar-link'>
-
-            <span>Dashboard</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="{{ route('mhs_ta') }}" class='sidebar-link'>
-            <i class="bi bi-people-fill"></i>
-            <span>Mahasiswa TA</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('aktif') }}">Mahasiswa Aktif</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('alumni') }}">Lulus / Alumni</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Seminar Proposal</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_dosbing') }}">Dosen Pembimbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_skripsi') }}">Judul Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/validasi_sempro">Berkas Administrasi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="{{ route('prasemhas_menu') }}" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Seminar Hasil</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('daftar_dosenPenguji') }}">Dosen Penguji</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/validasi_semhas">Berkas Administrasi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item">
-        <a href="/admin/validasi_sidang" class='sidebar-link'>
-            <i class="bi bi-file-earmark-medical-fill"></i>
-            <span>Pra Sidang Meja Hijau</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-person-badge-fill"></i>
-            <span>Manajemen User</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_admin">Admin</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_prodi">Prodi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_dosen">Dosen</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="/admin/manajemen_mhs">Mahasiswa</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub active">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-pen-fill"></i>
-            <span>Penjadwalan</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item active">
-                <a href="{{ route('jadwal_sempro') }}">Seminar Proposal</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_semhas') }}">Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('jadwal_sidang') }}">Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item has-sub">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clock-history"></i>
-            <span>Riwayat Aktivitas</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('log_pendaftaran_dosbing') }}">Riwayat Pendaftaran Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pengubahan_dosbing') }}">Riwayat Pengubahan Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_penghapusan_dosbing') }}">Riwayat Penghapusan Dosbing</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pendaftaran_skripsi') }}">Riwayat Pendaftaran Judul Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_pengubahan_skripsi') }}">Riwayat Pengubahan Skripsi</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('log_penghapusan_skripsi') }}">Riwayat Penghapusan Skripsi</a>
-            </li>
-        </ul>
-    </li>
-
-    <li class="sidebar-item">
-        <a href="{{ route('profile_admin') }}" class='sidebar-link'>
-
-            <span>Profil</span>
-        </a>
-    </li>
-
-    <li class="sidebar-item has-sub ">
-        <a href="#" class='sidebar-link'>
-            <i class="bi bi-clipboard-plus"></i>
-            <span>Input Nilai</span>
-        </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_IPK') }}">Input Nilai IPK</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_uji_program') }}">Input Nilai Uji Program</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('adm_nilai_semhas') }}">Input Nilai Seminar Hasil</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('nilai_sidang_admin') }}">Input Nilai Sidang Meja Hijau</a>
-            </li>
-        </ul>
-    </li>
-@endsection
+@include('admin/sidebar')
 
 @section('content')
     <div class="page-heading">
@@ -170,14 +14,6 @@
                 <div class="col-12 col-md-6 order-md-1 order-last">
                     <h3>Penjadwalan Seminar Proposal</h3>
                     <p class="text-subtitle text-muted">Penjadwalan Seminar Proposal Mahasiswa</p>
-                </div>
-                <div class="col-12 col-md-6 order-md-2 order-first">
-                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Penjadwalan</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Seminar Proposal</li>
-                        </ol>
-                    </nav>
                 </div>
             </div>
         </div>
@@ -204,8 +40,7 @@
                                                     <select
                                                         class="form-control  @error('tanggal_sempro') is-invalid @enderror"
                                                         id="tanggal_sempro" name="tanggal_sempro" required
-                                                        value="{{ old('tanggal_sempro') }}"
-                                                        autocomplete="tanggal_sempro">
+                                                        value="{{ old('tanggal_sempro') }}" autocomplete="tanggal_sempro">
                                                         <option value="">-- Pilih Jadwal Sempro --</option>
                                                         <?php $i; ?>
                                                         @for ($i = 0; $i <= count($query) - 1; $i++)
@@ -235,8 +70,7 @@
                                                     <select
                                                         class="form-control  @error('tanggal_sempro') is-invalid @enderror"
                                                         id="tanggal_sempro" name="tanggal_sempro" required
-                                                        value="{{ old('tanggal_sempro') }}"
-                                                        autocomplete="tanggal_sempro">
+                                                        value="{{ old('tanggal_sempro') }}" autocomplete="tanggal_sempro">
                                                         <option value="">-- Pilih Jadwal Sempro --</option>
                                                         <?php $j; ?>
                                                         @for ($j = 0; $j <= count($query) - 1; $j++)
@@ -269,7 +103,7 @@
                                 @endif
                                 <table class="table table-bordered mb-0">
                                     <thead class="text-center">
-                                        <tr>
+                                        <tr class="text-center table-success">
                                             <th>No.</th>
                                             <th>Nama/NIM</th>
                                             <th>Tanggal Sempro</th>
@@ -335,7 +169,7 @@
                                                                                 value="{{ $mahasiswa->nim }}">
                                                                             <button type="submit"
                                                                                 class="btn btn-warning btn-sm"><i
-                                                                                    class="bi bi-pencil-square"></i>&nbsp;&nbsp;</button>
+                                                                                    class="bi bi-pencil-square"></i>&nbsp;&nbsp;Edit</button>
                                                                         </form>
                                                                     </td>
                                                                     <td>
@@ -344,10 +178,65 @@
                                                                             @csrf
                                                                             <input type="hidden" name="nim"
                                                                                 value="{{ $mahasiswa->nim }}">
-                                                                            <button type="submit"
+                                                                            <button type="button"
+                                                                                class="btn btn-danger btn-sm"
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#deleteModal{{ $mahasiswa->nim }}"><i
+                                                                                    class="bi bi-trash"></i>&nbsp;&nbsp;Hapus</button>
+                                                                            <div class="modal fade
+                                                                                text-left"
+                                                                                id="deleteModal{{ $mahasiswa->nim }}"
+                                                                                tabindex="-1" role="dialog"
+                                                                                aria-labelledby="myModalLabel1"
+                                                                                aria-hidden="true">
+                                                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                                                                    role="document">
+                                                                                    <div class="modal-content">
+                                                                                        <div class="modal-header bg-danger">
+                                                                                            <h5 class="modal-title white"
+                                                                                                id="myModalLabel1">Hapus
+                                                                                                Jadwal Sempro</h5>
+                                                                                            <button type="button"
+                                                                                                class="close"
+                                                                                                data-bs-dismiss="modal"
+                                                                                                aria-label="Close">
+                                                                                                <i data-feather="x"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                        <div
+                                                                                            class="modal-body
+                                                                                            text-center">
+                                                                                            <p>Apakah Anda yakin ingin
+                                                                                                menghapus jadwal ini? Anda
+                                                                                                tidak akan dapat
+                                                                                                mengembalikan data yang
+                                                                                                telah dihapus.</p>
+                                                                                        </div>
+                                                                                        <div class="modal-footer">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-light-secondary"
+                                                                                                data-bs-dismiss="modal">
+                                                                                                <i
+                                                                                                    class="bx bx-x d-block d-sm-none"></i>
+                                                                                                <span
+                                                                                                    class="d-none d-sm-block">Batal</span>
+                                                                                            </button>
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-danger ml-1">
+                                                                                                <i
+                                                                                                    class="bx bx-check d-block d-sm-none"></i>
+                                                                                                <span
+                                                                                                    class="d-none d-sm-block">Hapus</span>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {{-- <button type="submit"
                                                                                 class="btn btn-danger btn-sm"
                                                                                 onclick="return confirm('Apakah Anda yakin ingin menghapus jadwal ini? Anda tidak akan dapat mengembalikan data yang telah dihapus.')"><i
-                                                                                    class="bi bi-trash"></i>&nbsp;&nbsp;</button>
+                                                                                    class="bi bi-trash"></i>&nbsp;&nbsp;</button> --}}
                                                                         </form>
                                                                     </td>
                                                                 @endif

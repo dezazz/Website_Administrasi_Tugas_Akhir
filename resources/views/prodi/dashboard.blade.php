@@ -46,9 +46,9 @@
             <span>Input Nilai</span>
         </a>
         <ul class="submenu">
-            <li class="submenu-item ">
+            {{-- <li class="submenu-item ">
                 <a href="{{ route('nilai_IPK') }}">Input Nilai IPK</a>
-            </li>
+            </li> --}}
             <li class="submenu-item ">
                 <a href="{{ route('nilai_uji_program') }}">Input Nilai Uji Program</a>
             </li>

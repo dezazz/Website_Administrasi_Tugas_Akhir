@@ -5,26 +5,17 @@
 @endsection
 
 @section('sidebar')
-    <li class="sidebar-item">
+    <li class="sidebar-item ">
         <a href="dashboard" class='sidebar-link'>
 
             <span>Dashboard</span>
         </a>
     </li>
 
-    <li class="sidebar-item has-sub ">
-        <a href="{{ route('mahasiswa_ta') }}" class='sidebar-link'>
-            {{-- <i class="bi bi-people-fill"></i> --}}
-            <span>Mahasiswa</span>
+    <li class="sidebar-item ">
+        <a href="{{ route('mhs_bimbingan') }}" class='sidebar-link'>
+            <span>Mahasiswa Bimbingan</span>
         </a>
-        <ul class="submenu">
-            <li class="submenu-item ">
-                <a href="{{ route('mhs_aktif') }}">Mahasiswa Aktif</a>
-            </li>
-            <li class="submenu-item ">
-                <a href="{{ route('lulus') }}">Lulus / Alumni</a>
-            </li>
-        </ul>
     </li>
     <li class="sidebar-item has-sub ">
         <a href="{{ route('mahasiswa_ta') }}" class='sidebar-link'>
@@ -44,7 +35,7 @@
         </ul>
     </li>
     <li class="sidebar-item has-sub active">
-        <a href="/jadwalSeminarSidang" class='sidebar-link'>
+        <a href="/jadwalSeminarSidang" class='sidebar-link active'>
             {{-- <i class="bi bi-people-fill"></i> --}}
             <span>Jadwal</span>
         </a>
@@ -55,8 +46,24 @@
             <li class="submenu-item ">
                 <a href="/dosen/semhas">Seminar Hasil</a>
             </li>
-            <li class="submenu-item ">
+            <li class="submenu-item active">
                 <a href="/dosen/sidang">Sidang Meja Hijau</a>
+            </li>
+        </ul>
+    </li>
+    <li class="sidebar-item has-sub ">
+        <a href="#" class='sidebar-link '>
+            <span>Input Nilai</span>
+        </a>
+        <ul class="submenu">
+            <li class="submenu-item ">
+                <a href="{{ route('v_nilai_uji_program') }}">Input Nilai Uji Program</a>
+            </li>
+            <li class="submenu-item ">
+                <a href="{{ route('v_nilai_semhas') }}">Input Nilai Seminar Hasil</a>
+            </li>
+            <li class="submenu-item ">
+                <a href="{{ route('v_nilai_sidang') }}">Input Nilai Sidang Meja Hijau</a>
             </li>
         </ul>
     </li>

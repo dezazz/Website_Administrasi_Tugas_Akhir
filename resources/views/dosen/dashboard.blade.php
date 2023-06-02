@@ -121,26 +121,22 @@
                 </div>
             </div> --}}
             <div class="row">
-                <div class="col-xl-12">
+                <div class="col-md-12">
                     <div class="row">
                         <!-- SHORTCUT 1 -->
-                        <div class="col-xl-4 col-md-6 col-sm-12">
+                        <div class="col-md-8">
                             <div class="card">
                                 <div class="card-content">
                                     <div class="card-body">
-                                        <h4 class="card-title">Jadwal Seminar Proposal</h4>
-                                        <p class="card-text">
-                                            Jadwal Seminar Proposal Mahasiswa Bimbingan
-                                        </p>
-                                        <a href="/dosen/sempro" class="btn btn-primary btn-sm"><i
-                                                class="bi bi-check-circle"></i> Akses</a>
+                                        <h3 class="card-title text-center">SELAMAT DATANG DI SISTEM ADMINISTRASI SKRIPSI
+                                        </h3>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- END SHORTCUT 1 -->
                     </div>
-                    <div class="row">
+                    {{-- <div class="row">
                         <!-- SHORTCUT 2 -->
                         <div class="col-xl-4 col-md-6 col-sm-12">
                             <div class="card">
@@ -175,7 +171,7 @@
                             </div>
                         </div>
                         <!-- END SHORTCUT 3 -->
-                    </div>
+                    </div> --}}
                     {{-- <div class="row">
                     </div> --}}
                 </div>
